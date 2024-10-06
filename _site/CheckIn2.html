@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Theresa Szczepanski">
+
+<title>CheckIn2.qmd</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">DACSS758 Final</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./CheckIn1.html"> 
+<span class="menu-text">Check In 1</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./CheckIn2.html" aria-current="page"> 
+<span class="menu-text">Check In 2</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#final-project" id="toc-final-project" class="nav-link active" data-scroll-target="#final-project">Final Project</a></li>
+  <li><a href="#load-libraries" id="toc-load-libraries" class="nav-link" data-scroll-target="#load-libraries">Load Libraries</a></li>
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">Load Data</a></li>
+  <li><a href="#create-corpus" id="toc-create-corpus" class="nav-link" data-scroll-target="#create-corpus">Create Corpus</a></li>
+  <li><a href="#tokenization-p-n" id="toc-tokenization-p-n" class="nav-link" data-scroll-target="#tokenization-p-n">Tokenization P-N…</a>
+  <ul class="collapse">
+  <li><a href="#lowerase" id="toc-lowerase" class="nav-link" data-scroll-target="#lowerase">lowerase</a></li>
+  <li><a href="#remove-punctation" id="toc-remove-punctation" class="nav-link" data-scroll-target="#remove-punctation">remove punctation</a></li>
+  <li><a href="#remove-stopwords" id="toc-remove-stopwords" class="nav-link" data-scroll-target="#remove-stopwords">remove stopwords</a></li>
+  <li><a href="#lemma" id="toc-lemma" class="nav-link" data-scroll-target="#lemma">lemma??</a></li>
+  <li><a href="#n-grams" id="toc-n-grams" class="nav-link" data-scroll-target="#n-grams">n-grams?</a></li>
+  </ul></li>
+  <li><a href="#pretextpreprocessing-decisions" id="toc-pretextpreprocessing-decisions" class="nav-link" data-scroll-target="#pretextpreprocessing-decisions">PreTextPreProcessing Decisions?</a></li>
+  <li><a href="#word-cloud" id="toc-word-cloud" class="nav-link" data-scroll-target="#word-cloud">Word Cloud</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Check in 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Theresa Szczepanski </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>You have been thinking about your research question and data source in the previous weeks. Now you have learned how to scrape online data, and how to get the data ready for basic text analysis (e.g.&nbsp;tokenization, stemming, remove punctuation, remove stopwords, n-gram, ect.)&nbsp;<br>
+<br>
+In this check-in, you need to&nbsp;<br>
+1. Restate your research question and hypothesis (totally fine if it’s different from Check-in 1)<br>
+2. What is the data source you are going to use for your final project? Is it already collected by others, or do you need to scrape data yourself? <strong>Get your data ready and read them in R</strong>.<br>
+3. You may get messy data (e.g.&nbsp;several key elements are combined under one variable). Clean your data in a tidy and meaningful way.<br>
+4. Preprocess the data (e.g.&nbsp;tokenization etc.) and start explore some descriptive information by making wordclouds and tables. You are welcome to use any codes that you have learned up to this point of the course.&nbsp;<br>
+<br>
+Note: Turn in this assignment as a standalone html file. Check the instruction of Assignment 0 for creating a standalone html file.</p>
+<section id="final-project" class="level1">
+<h1>Final Project</h1>
+<p>After reading the articles, think about the final project you want to do in this course, and answer the questions below:</p>
+<p><br>
+1. What research topic you want to study? Do you have a specific research question?</p>
+<p>I work for a public charter school in Massachusetts. Our students in Grades 5-10 are tested annually in Mathematics, English Language Arts, and Science. I am interested in using the student performance data to identify areas of weakness in our program in terms of curricular alignment. For every question on a given assessment, the state releases an <strong>item description</strong> detailing what was asked of students and the corresponding average score earned by students in our school as well as the average score earned by students across Massachusetts.</p>
+<p><strong><em>My research question is</em></strong>: “Can test item descriptions on MCAS assessments be mined to extract features associated with student performance trends?”</p>
+<p><br>
+2. Do you have any hypothesis/expected answer to your research question?</p>
+<p>I have already found statistically significant patterns in student performance associated with an item’s content reporting category in every subject and grade level at our school. When interviewing one of our experienced teachers who has historical success with student achievement in English Language Arts (ELA), she identified specific things that she believes all kids need to practice for success with (ELA), such as “synthesizing multiple texts”, “reading non-fiction”, and “identifying text features”. These are requirements in questions that can be mined from item descriptions but not from an item’s reporting category or standard description. Our students have historically performed weaker on the 7th grade English Language Arts exam than on the 6th and 8th grade exams. This suggests a curricular issue. I’ve already identified reporting categories in which our students have performed relatively weaker on this assessment. I suspect that within these reporting categories there exist patterns to the types of questions or tasks that our students struggle with. This could provide valuable information for teachers to adjust their instruction and instructional materials.</p>
+<p>Similarly, in Mathematics I have identified specific content reporting categories that are relative weaknesses at different grade levels; however, this does not take into account the differences in questions like those Uurrutia and Araya classified in open-ended Math prompts. I would be curious to see if our students are weaker in items that ask them to evaluate an expression (apply technical skills) vs.&nbsp;construct or interpret a mathematical model (conceptual understanding). This would be very interesting information for teachers.</p>
+<p><strong><em>Hypotheses</em></strong>:</p>
+<p><strong><em>H1</em></strong>: A predictive model of 7th grade student performance on 7th grade English Language Arts assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item’s content reporting category.</p>
+<p><strong><em>H2</em></strong>: A predictive model of 6th grade student performance on 6th grade Mathematics assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item’s content reporting category.</p>
+<p><br>
+3. What are some potential data sources?</p>
+<p>I can scrape the <a href="https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&amp;subjectcode=ELA&amp;linkid=10&amp;orgcode=04830000&amp;fycode=2023&amp;orgtypecode=5&amp;">Department of Elementary and Secondary Educations’ accountability page</a>. It includes tables for all Next Generation MCAS tests (beginning in 2018) and text descriptions for all test items. I have actually already done this for the High School Science Exams in my Python course last fall. The structures of the tables are similar for the other exams.</p>
+<p><br>
+4. Is any of the text-as-data methods you identified in the journal articles may be helpful to your research?</p>
+<p>In Uurrutia and Araya’s paper, they used <strong><em>classification</em></strong> to categorize open-ended mathematics questions into different types. I would like to classify the MCAS questions into different categories using the item descriptions.</p>
+<p>For the Mathematics items, I would also like to use <strong>topic modeling</strong> to identify different topics within a given content reporting category. For example, Grade 6 students are assessed in the category <em>Geometry</em> on their ability to “Solve real-world and mathematical problems involving area, surface area, and volume.” I would like to parse out if there are distinctions between their performance on tasks involving <em>area</em> versus tasks involving <em>volume</em>. Being able to classify a problem as an <em>area</em> versus <em>volume</em> problem would allow me to do this. On a broader level, I would like to distinguish between items that ask students to apply technical or <em>computational</em> skills versus constructing or interpreting models (<em>conceptual understanding</em>).</p>
+<p>For the English Language Arts items, I would like to classify items as to whether or not they require the “synthesis of multiple texts” and whether or not they require the analysis of “text features”.</p>
+<p><br>
+At this phase, you might have more questions than answers. Document all those questions.</p>
+<ol type="1">
+<li><p>I have also downloaded PDFs of all of the released paper-based versions of the MCAS tests. Here is an <a href="https://www.doe.mass.edu/mcas/2023/release/g5-math.pdf">example of a Math test</a>. Do you think it would be possible to parse out the text of each question into a data frame? The question texts themselves would also be interesting to analyze. I was wondering if you think it is an achievable task. If so, I’m curious to see more about how to set up a corpus with texts contained in PDF files.</p></li>
+<li><p>For any subject and grade level, my data set of text would consist of approximately 200 items and their corresponding text descriptions. Is that large enough?</p></li>
+<li><p>The Urrutia and Araya article discussed creating linguistic features using <strong>dep/NumMod</strong> tokens and <strong>tag/Num</strong> tokens. I was wondering if there is a good place for me to read about and understand them as a concept?</p></li>
+<li><p>The Varinhos article discusses the use of topic modeling. This is something I would be interested in applying. Is there a good place to read about the fundamentals of topic modeling?</p></li>
+</ol>
+</section>
+<section id="load-libraries" class="level1">
+<h1>Load Libraries</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: usethis</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plyr)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Package version: 4.1.0
+Unicode version: 14.0
+ICU version: 71.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Parallel computing: disabled</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>See https://quanteda.io for tutorials and examples.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda.textstats)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"quanteda.textplots"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ lubridate 1.9.3     ✔ tibble    3.2.1
+✔ purrr     1.0.2     ✔ tidyr     1.3.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::arrange()   masks plyr::arrange()
+✖ purrr::compact()   masks plyr::compact()
+✖ dplyr::count()     masks plyr::count()
+✖ dplyr::desc()      masks plyr::desc()
+✖ dplyr::failwith()  masks plyr::failwith()
+✖ dplyr::filter()    masks stats::filter()
+✖ dplyr::id()        masks plyr::id()
+✖ dplyr::lag()       masks stats::lag()
+✖ dplyr::mutate()    masks plyr::mutate()
+✖ dplyr::rename()    masks plyr::rename()
+✖ dplyr::summarise() masks plyr::summarise()
+✖ dplyr::summarize() masks plyr::summarize()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+</div>
+</section>
+<section id="load-data" class="level1">
+<h1>Load Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>STE_DF<span class="ot">&lt;-</span><span class="fu">read_csv</span>(<span class="st">"STE_all_years_2024.csv"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">item description</span><span class="st">`</span>, year, number, type, <span class="st">`</span><span class="at">reporting category</span><span class="st">`</span>, <span class="st">`</span><span class="at">discipline core idea</span><span class="st">`</span>, <span class="st">`</span><span class="at">standard</span><span class="st">`</span>, <span class="st">`</span><span class="at">standard desc</span><span class="st">`</span>, <span class="st">`</span><span class="at">pts</span><span class="st">`</span>, <span class="st">`</span><span class="at">school%</span><span class="st">`</span>, <span class="st">`</span><span class="at">state%</span><span class="st">`</span>, school_state_diff, grade_level, item_library_URL)<span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">number =</span> <span class="fu">as.factor</span>(number))<span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">grade_level =</span> <span class="fu">as.factor</span>(grade_level))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 521 Columns: 15
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): type, reporting category, standard, item description, discipline co...
+dbl (7): year, number, pts, school%, state%, school_state_diff, grade_level
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+</section>
+<section id="create-corpus" class="level1">
+<h1>Create Corpus</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>STE_item_corpus <span class="ot">&lt;-</span><span class="fu">corpus</span>(STE_DF, <span class="at">text_field =</span> <span class="st">"item description"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#print(STE_item)</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(STE_item_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Corpus consisting of 521 documents, showing 100 documents:
+
+    Text Types Tokens Sentences year number type reporting category
+   text1    13     14         1 2019      1   SR                 TE
+   text2    16     17         1 2019      2   SR                 PS
+   text3    13     14         1 2019      3   SR                 PS
+   text4    20     24         1 2019      4   CR                 TE
+   text5    23     27         1 2019      5   CR                 ES
+   text6    19     22         1 2019      6   SR                 LS
+   text7    15     15         1 2019      7   SR                 TE
+   text8    16     21         1 2019      8   SR                 TE
+   text9    15     16         1 2019      9   SR                 PS
+  text10    16     19         1 2019     10   SR                 PS
+  text11    14     19         1 2019     11   SR                 ES
+  text12    13     13         1 2019     12   SR                 PS
+  text13    22     26         1 2019     13   SR                 LS
+  text14    18     19         1 2019     14   SR                 ES
+  text15    17     19         1 2019     15   SR                 PS
+  text16    13     14         1 2019     16   CR                 LS
+  text17    16     16         1 2019     17   SR                 LS
+  text18    14     15         1 2019     18   SR                 LS
+  text19    10     10         1 2019     19   SR                 PS
+  text20    12     13         1 2019     20   SR                 ES
+  text21    13     15         1 2019     21   SR                 ES
+  text22    13     13         1 2019     22   SR                 TE
+  text23    10     12         1 2019     23   SR                 PS
+  text24    11     11         1 2019     24   SR                 LS
+  text25    14     15         1 2019     25   SR                 TE
+  text26    19     23         1 2019     26   SR                 PS
+  text27    18     22         1 2019     27   CR                 ES
+  text28    13     13         1 2019     28   SR                 TE
+  text29    16     17         1 2019     29   SR                 ES
+  text30    16     17         1 2019     30   SR                 ES
+  text31    14     15         1 2019     31   SR                 LS
+  text32    12     14         1 2019     32   SR                 LS
+  text33    13     13         1 2019     33   SR                 LS
+  text34    11     17         1 2019     34   SR                 LS
+  text35    25     27         1 2019     35   CR                 LS
+  text36    19     20         1 2019     36   SR                 ES
+  text37    26     29         1 2019     37   CR                 PS
+  text38    15     20         1 2019     38   SR                 ES
+  text39    12     13         1 2019     39   SR                 TE
+  text40    12     12         1 2019     40   SR                 TE
+  text41    11     12         1 2019     41   SR                 TE
+  text42    17     19         1 2021      1   SR                 TE
+  text43    16     16         1 2021      2   SR                 PS
+  text44    10     11         1 2021      3   SR                 LS
+  text45    18     19         1 2021      4   SR                 ES
+  text46    13     13         1 2021      5   SR                 TE
+  text47    12     12         1 2021      6   SR                 PS
+  text48    16     19         1 2021      7   SR                 LS
+  text49    13     13         1 2021      8   SR                 LS
+  text50    16     16         1 2021      9   SR                 ES
+  text51    18     23         1 2021     10   SR                 ES
+  text52    13     14         1 2021     11   SR                 ES
+  text53    19     20         1 2021     12   CR                 ES
+  text54    22     25         1 2021     13   CR                 LS
+  text55    25     28         1 2021     14   CR                 TE
+  text56    19     22         1 2021     15   SR                 LS
+  text57    13     17         1 2021     16   SR                 PS
+  text58    14     16         1 2021     17   SR                 TE
+  text59    10     10         1 2021     18   SR                 PS
+  text60    11     11         1 2021     19   SR                 PS
+  text61    10     11         1 2021     20   SR                 TE
+  text62    14     14         1 2021     21   SR                 LS
+  text63    11     11         1 2021     22   SR                 LS
+  text64    13     15         1 2021     23   SR                 PS
+  text65    15     15         1 2021     24   SR                 PS
+  text66    12     12         1 2021     25   SR                 PS
+  text67    22     25         1 2021     26   CR                 PS
+  text68    18     23         1 2021     27   CR                 TE
+  text69    19     21         1 2021     28   SR                 ES
+  text70    14     16         1 2021     29   SR                 TE
+  text71    21     28         1 2021     30   CR                 ES
+  text72    12     12         1 2021     31   SR                 LS
+  text73    10     10         1 2021     32   SR                 ES
+  text74    16     18         1 2021     33   SR                 LS
+  text75    21     24         1 2021     34   SR                 ES
+  text76    14     14         1 2021     35   SR                 LS
+  text77    13     13         1 2021     36   SR                 TE
+  text78    17     17         1 2021     37   SR                 LS
+  text79    12     14         1 2021     38   SR                 TE
+  text80    17     23         1 2021     39   SR                 PS
+  text81    18     18         1 2021     40   SR                 PS
+  text82    15     15         1 2021     41   SR                 LS
+  text83    17     23         1 2022      1   SR                 ES
+  text84    13     14         1 2022      2   SR                 ES
+  text85    21     25         1 2022      3   SR                 PS
+  text86    20     21         1 2022      4   SR                 ES
+  text87    23     35         1 2022      5   CR                 PS
+  text88    24     26         2 2022      6   SR                 ES
+  text89    13     14         1 2022      7   SR                 TE
+  text90    14     15         1 2022      8   SR                 TE
+  text91    13     13         1 2022      9   SR                 TE
+  text92    12     12         1 2022     10   SR                 ES
+  text93    17     17         1 2022     11   SR                 PS
+  text94    18     18         1 2022     12   SR                 LS
+  text95    18     19         1 2022     13   SR                 LS
+  text96    15     16         1 2022     14   SR                 LS
+  text97    23     31         1 2022     15   CR                 LS
+  text98    15     15         1 2022     16   SR                 ES
+  text99    26     29         1 2022     17   CR                 PS
+ text100    13     14         1 2022     18   SR                 TE
+                                                  discipline core idea
+                                   Materials, Tools, and Manufacturing
+                                           Matter and Its Interactions
+ Waves and Their Applications in Technologies for Information Transfer
+                                                 Technological Systems
+                                                       Earth's Systems
+                         Heredity: Inheritance and Variation of Traits
+                                                    Engineering Design
+                                   Materials, Tools, and Manufacturing
+                                                                Energy
+                                           Matter and Its Interactions
+                                         Earth's Place in the Universe
+                         Motion and Stability: Forces and Interactions
+                        Ecosystems: Interactions, Energy, and Dynamics
+                                                       Earth's Systems
+                                                                Energy
+                             Biological Evolution: Unity and Diversity
+                        Ecosystems: Interactions, Energy, and Dynamics
+                 From Molecules to Organisms: Structures and Processes
+                                                                Energy
+                                                       Earth's Systems
+                                         Earth's Place in the Universe
+                                   Materials, Tools, and Manufacturing
+                         Motion and Stability: Forces and Interactions
+                 From Molecules to Organisms: Structures and Processes
+                                                 Technological Systems
+                                           Matter and Its Interactions
+                                         Earth's Place in the Universe
+                                                 Technological Systems
+                                         Earth's Place in the Universe
+                                              Earth and Human Activity
+                 From Molecules to Organisms: Structures and Processes
+                        Ecosystems: Interactions, Energy, and Dynamics
+                 From Molecules to Organisms: Structures and Processes
+                         Heredity: Inheritance and Variation of Traits
+                             Biological Evolution: Unity and Diversity
+                                                       Earth's Systems
+                                           Matter and Its Interactions
+                                         Earth's Place in the Universe
+                                   Materials, Tools, and Manufacturing
+                                                    Engineering Design
+                                                 Technological Systems
+                                   Materials, Tools, and Manufacturing
+                                                                Energy
+                         Heredity: Inheritance and Variation of Traits
+                                         Earth's Place in the Universe
+                                                    Engineering Design
+ Waves and Their Applications in Technologies for Information Transfer
+                         Heredity: Inheritance and Variation of Traits
+                 From Molecules to Organisms: Structures and Processes
+                                                       Earth's Systems
+                                                       Earth's Systems
+                                                       Earth's Systems
+                                                       Earth's Systems
+                 From Molecules to Organisms: Structures and Processes
+                                                    Engineering Design
+                         Heredity: Inheritance and Variation of Traits
+                                           Matter and Its Interactions
+                                                 Technological Systems
+                                           Matter and Its Interactions
+                                           Matter and Its Interactions
+                                                 Technological Systems
+                        Ecosystems: Interactions, Energy, and Dynamics
+                             Biological Evolution: Unity and Diversity
+                                                                Energy
+                                           Matter and Its Interactions
+                                           Matter and Its Interactions
+                                                                Energy
+                                                 Technological Systems
+                                                       Earth's Systems
+                                                 Technological Systems
+                                         Earth's Place in the Universe
+                         Heredity: Inheritance and Variation of Traits
+                                         Earth's Place in the Universe
+                 From Molecules to Organisms: Structures and Processes
+                                              Earth and Human Activity
+                        Ecosystems: Interactions, Energy, and Dynamics
+                                   Materials, Tools, and Manufacturing
+                        Ecosystems: Interactions, Energy, and Dynamics
+                                   Materials, Tools, and Manufacturing
+ Waves and Their Applications in Technologies for Information Transfer
+                         Motion and Stability: Forces and Interactions
+                             Biological Evolution: Unity and Diversity
+                                         Earth's Place in the Universe
+                                              Earth and Human Activity
+                         Motion and Stability: Forces and Interactions
+                                         Earth's Place in the Universe
+                                                                Energy
+                                              Earth and Human Activity
+                                                 Technological Systems
+                                                 Technological Systems
+                                   Materials, Tools, and Manufacturing
+                                                       Earth's Systems
+                                                                Energy
+                        Ecosystems: Interactions, Energy, and Dynamics
+                        Ecosystems: Interactions, Energy, and Dynamics
+                        Ecosystems: Interactions, Energy, and Dynamics
+                        Ecosystems: Interactions, Energy, and Dynamics
+                                                       Earth's Systems
+                                           Matter and Its Interactions
+                                                 Technological Systems
+  standard
+ 6.ETS.2.1
+  8.PS.1.4
+  6.PS.4.1
+ 7.ETS.3.4
+ 8.ESS.2.1
+  8.LS.3.4
+ 7.ETS.1.2
+ 8.ETS.2.5
+  7.PS.3.4
+  6.PS.1.7
+ 8.ESS.1.1
+  8.PS.2.2
+  7.LS.2.4
+ 7.ESS.2.4
+  7.PS.3.2
+  8.LS.4.5
+  7.LS.2.2
+  6.LS.1.2
+  7.PS.3.6
+ 8.ESS.2.5
+ 6.ESS.1.5
+ 6.ETS.2.3
+  7.PS.2.3
+  6.LS.1.3
+ 7.ETS.3.3
+  6.PS.1.8
+ 8.ESS.1.2
+ 7.ETS.3.5
+ 6.ESS.1.4
+ 8.ESS.3.5
+  8.LS.1.5
+  7.LS.2.2
+  7.LS.1.4
+  8.LS.3.2
+  6.LS.4.1
+ 7.ESS.2.2
+  6.PS.1.6
+ 6.ESS.1.1
+ 6.ETS.2.1
+ 6.ETS.1.5
+ 7.ETS.3.1
+ 6.ETS.2.2
+  7.PS.3.7
+  8.LS.3.3
+ 6.ESS.1.1
+ 6.ETS.1.5
+  6.PS.4.2
+  8.LS.3.1
+  8.LS.1.5
+ 8.ESS.2.1
+ 7.ESS.2.2
+ 8.ESS.2.1
+ 6.ESS.2.3
+  6.LS.1.3
+ 7.ETS.1.2
+  8.LS.3.4
+  6.PS.1.7
+ 7.ETS.3.1
+  8.PS.1.2
+  8.PS.1.1
+ 7.ETS.3.5
+  7.LS.2.5
+  8.LS.4.4
+  7.PS.3.6
+  8.PS.1.4
+  8.PS.1.5
+  7.PS.3.3
+ 7.ETS.3.4
+ 8.ESS.2.5
+ 7.ETS.3.3
+ 8.ESS.1.2
+  8.LS.3.2
+ 8.ESS.1.1
+  7.LS.1.4
+ 8.ESS.3.5
+  7.LS.2.3
+ 8.ETS.2.5
+  7.LS.2.2
+ 6.ETS.2.3
+  6.PS.4.1
+  7.PS.2.3
+  6.LS.4.1
+ 6.ESS.1.5
+ 7.ESS.3.2
+  7.PS.2.3
+ 8.ESS.1.2
+  7.PS.3.1
+ 8.ESS.3.5
+ 7.ETS.3.5
+ 7.ETS.3.3
+ 6.ETS.2.3
+ 8.ESS.2.5
+  7.PS.3.4
+  7.LS.2.2
+  7.LS.2.3
+  7.LS.2.4
+  7.LS.2.1
+ 7.ESS.2.4
+  6.PS.1.6
+ 7.ETS.3.1
+                                                                                                                                                                                                                                                                                                                                          standard desc
+                                                                                                                                                                   Analyze and compare properties of metals, plastics, wood, and ceramics, including flexibility, ductility, hardness, thermal conductivity, electrical conductivity, and melting point
+                                                                                                                                                              Develop a model that describes and predicts changes in particle motion, relative spatial arrangement, temperature, and state of a pure substance when thermal energy is added or removed.
+                                                                                                                                           Use diagrams of a simple wave to explain that (a) a wave has a repeating pattern with a specific amplitude, frequency, and wavelength, and (b) the amplitude of a wave is related to the energy of the wave.
+                                                                                                                                                                    Show how the components of a structural system work together to serve a structural function. Provide examples of physical structures and relate their design to their intended use.
+      Use a model to illustrate that energy from Earth’s interior drives convection that cycles Earth’s crust, leading to melting, crystallization, weathering, and deformation of large rock formations, including generation of ocean sea floor at ridges, submergence of ocean sea floor at trenches, mountain building, and active volcanic chains.
+                                       Develop and use a model to show that sexually reproducing organisms have two of each chromosome in their cell nuclei, and hence two variants (alleles) of each gene that can be the same or different from each other, with one random assortment of each chromosome passed down to offspring from both parents.
+ Evaluate competing solutions to a given design problem using a decision matrix to determine how well each meets the criteria and constraints of the problem. Use a model of each solution to evaluate how variations in one or more design features, including size, shape, weight, or cost, may affect the function or effectiveness of the solution.
+                                          Present information that illustrates how a product can be created using basic processes in manufacturing systems, including forming, separating, conditioning, assembling, finishing, quality control, and safety. Compare the advantages and disadvantages of human vs. computer control of these processes.
+                                                                                      Conduct an investigation to determine the relationships among the energy transferred, how well the type of matter retains or radiates heat, the mass, and the change in the average kinetic energy of the particles as measured by the temperature of the sample.
+                                                                                                                                Use a particulate model of matter to explain that density is the amount of matter (mass) in a given volume. Apply proportional reasoning to describe, calculate, and compare relative densities of different materials.
+                                                                                                                                            Develop and use a model of the Earth-Sun system to explain the cyclical pattern of seasons, which includes Earth’s tilt and differential intensity of sunlight on different areas of Earth across the year.
+                                                                                                                                                                                                       Provide evidence that the change in an object’s speed depends on the sum of the forces on the object (the net force) and the mass of the object.
+                                                                                                                                                                           Analyze data to provide evidence that disruptions (natural or human-made) to any physical or biological component of an ecosystem can lead to shifts in all its populations.
+                                                                                                                                                         Develop a model to explain how the energy of the Sun and Earth’s gravity drive the cycling of water, including changes of state, as it moves through multiple pathways in Earth’s hydrosphere.
+                                                                                                                                                                                    Develop a model to describe the relationship between the relative positions of objects interacting at a distance and their relative potential energy in the system.
+                                                                                                                                                                                            Synthesize and communicate information about artificial selection, or the ways in which humans have changed the inheritance of desired traits in organisms.
+                                                                                                                                              Describe how relationships among and between organisms in an ecosystem can be competitive, predatory, parasitic, and mutually beneficial and that these interactions are found across multiple ecosystems
+                                                                                                                      Develop and use a model to describe how parts of cells contribute to the cellular functions of obtaining food, water, and other nutrients from its environment, disposing of wastes, and providing energy for cellular processes.
+                                                                                                                                                                                               Use a model to explain how thermal energy is transferred out of hotter regions or objects and into colder ones by convection, conduction, and radiation.
+                                                                                                                                                                                                                    Interpret basic weather data to identify patterns in air mass interactions and the relationship of those patterns to local weather.
+                                                                                                                                                                                    Use graphical displays to illustrate that Earth and its solar system are one of many in the Milky Way galaxy, which is one of billions of galaxies in the universe.
+                                                                                                                                                                                                              Choose and safely use appropriate measuring tools, hand tools, fasteners, and common hand-held power tools used to construct a prototype.
+                                                                                                                                                                                                                                   Analyze data to describe the effect of distance and magnitude of electric charge on the strength of electric forces.
+                                                                                                                                                                                                                                   Construct an argument supported by evidence that the body systems interact to carry out essential functions of life.
+                                                      Research and communicate information about how transportation systems are designed to move people and goods using a variety of vehicles and devices. Identify and describe subsystems of a transportation vehicle, including structural, propulsion, guidance, suspension, and control subsystems
+                                                                                                                                                                                        Conduct an experiment to show that many materials are mixtures of pure substances that can be separated by physical means into their component pure substances.
+                                                                                                                                                                                                                            Explain the role of gravity in ocean tides, the orbital motions of planets, their moons, and asteroids in the solar system.
+                                                                                                                                                                                    Use the concept of systems engineering to model inputs, processes, outputs, and feedback among components of a transportation, structural, or communication system.
+                                                                                                                                                                                  Analyze and interpret rock layers and index fossils to determine the relative ages of rock formations that result from processes occurring over long periods of time.
+                                                                                                                                                                                                    Examine and interpret data to describe the role that human activities have played in causing the rise in global temperatures over the past century.
+                                                                                                                                                                                                                                   Construct an argument based on evidence for how environmental and genetic factors influence the growth of organisms.
+                                                                                                                                              Describe how relationships among and between organisms in an ecosystem can be competitive, predatory, parasitic, and mutually beneficial and that these interactions are found across multiple ecosystems
+                                                                                                                                                          Construct an explanation based on evidence for how characteristic animal behaviors and specialized plant structures increase the probability of successful reproduction of animals and plants
+                                                                Construct an argument based on evidence for how asexual reproduction results in offspring with identical genetic information and sexual reproduction results in offspring with genetic variation. Compare and contrast advantages and disadvantages of asexual and sexual reproduction.
+                                                                                                                                                                             Analyze and interpret evidence from the fossil record to describe organisms and their environment, extinctions, and changes to life forms throughout the history of Earth.
+                                                                                                                                                                                                                    Construct an explanation based on evidence for how Earth’s surface has changed over scales that range from local to global in size.
+                                                                                                                                                                                            Plan and conduct an experiment involving exothermic and endothermic chemical reactions to measure and describe the release or absorption of thermal energy.
+                                                                                                                                                                                                                           Develop and use a model of the Earth-Sun-Moon system to explain the causes of lunar phases and eclipses of the Sun and Moon.
+                                                                                                                                                                   Analyze and compare properties of metals, plastics, wood, and ceramics, including flexibility, ductility, hardness, thermal conductivity, electrical conductivity, and melting point
+                                                                                                                                                                                                         Create visual representations of solutions to a design problem. Accurately interpret and apply scale and proportion to visual representations.
+                                                                                                                                                                                               Explain the function of a communication system and the role of its components, including a source, encoder, transmitter, receiver, decoder, and storage.
+                                                                                                                                                                                                                               Given a design task, select appropriate materials based on specific properties needed in the construction of a solution.
+                                                                                                                                                                                                          Use informational text to describe the relationship between kinetic and potential energy and illustrate conversions from one form to another.
+                                                                                                                         Communicate through writing and in diagrams that chromosomes contain many distinct genes and that each gene holds the instructions for the production of specific proteins, which in turn affects the traits of an individual.
+                                                                                                                                                                                                                           Develop and use a model of the Earth-Sun-Moon system to explain the causes of lunar phases and eclipses of the Sun and Moon.
+                                                                                                                                                                                                         Create visual representations of solutions to a design problem. Accurately interpret and apply scale and proportion to visual representations.
+                                                                                                                                                                                                     Use diagrams and other models to show that both light rays and mechanical waves are reflected, absorbed, or transmitted through various materials.
+                                                                                                                    Develop and use a model to describe that structural changes to genes (mutations) may or may not result in changes to proteins, and if there are changes to proteins there may be harmful, beneficial, or neutral changes to traits.
+                                                                                                                                                                                                                                   Construct an argument based on evidence for how environmental and genetic factors influence the growth of organisms.
+      Use a model to illustrate that energy from Earth’s interior drives convection that cycles Earth’s crust, leading to melting, crystallization, weathering, and deformation of large rock formations, including generation of ocean sea floor at ridges, submergence of ocean sea floor at trenches, mountain building, and active volcanic chains.
+                                                                                                                                                                                                                    Construct an explanation based on evidence for how Earth’s surface has changed over scales that range from local to global in size.
+      Use a model to illustrate that energy from Earth’s interior drives convection that cycles Earth’s crust, leading to melting, crystallization, weathering, and deformation of large rock formations, including generation of ocean sea floor at ridges, submergence of ocean sea floor at trenches, mountain building, and active volcanic chains.
+                                                                                                                                  Analyze and interpret maps showing the distribution of fossils and rocks, continental shapes, and seafloor structures to provide evidence that Earth’s plates have moved great distances, collided, and spread apart.
+                                                                                                                                                                                                                                   Construct an argument supported by evidence that the body systems interact to carry out essential functions of life.
+ Evaluate competing solutions to a given design problem using a decision matrix to determine how well each meets the criteria and constraints of the problem. Use a model of each solution to evaluate how variations in one or more design features, including size, shape, weight, or cost, may affect the function or effectiveness of the solution.
+                                       Develop and use a model to show that sexually reproducing organisms have two of each chromosome in their cell nuclei, and hence two variants (alleles) of each gene that can be the same or different from each other, with one random assortment of each chromosome passed down to offspring from both parents.
+                                                                                                                                Use a particulate model of matter to explain that density is the amount of matter (mass) in a given volume. Apply proportional reasoning to describe, calculate, and compare relative densities of different materials.
+                                                                                                                                                                                               Explain the function of a communication system and the role of its components, including a source, encoder, transmitter, receiver, decoder, and storage.
+                                                                                                                                                                                                  Analyze and interpret data on the properties of substances before and after the substances interact to determine if a chemical reaction has occurred.
+      Develop a model to describe that (a) atoms combine in a multitude of ways to produce pure substances which make up all of the living and nonliving things that we encounter, (b) atoms form molecules and compounds that range in size from two to thousands of atoms, and (c) mixtures are composed of different proportions of pure substances.
+                                                                                                                                                                                    Use the concept of systems engineering to model inputs, processes, outputs, and feedback among components of a transportation, structural, or communication system.
+                                                                                                                                                                                                                                     Evaluate competing design solutions for protecting an ecosystem. Discuss benefits and limitations of each design.*
+                                                               Use a model to describe the process of natural selection, in which genetic variations of some traits in a population increase some individuals’ likelihood of surviving and reproducing in a changing environment. Provide evidence that natural selection occurs over many generations.
+                                                                                                                                                                                               Use a model to explain how thermal energy is transferred out of hotter regions or objects and into colder ones by convection, conduction, and radiation.
+                                                                                                                                                              Develop a model that describes and predicts changes in particle motion, relative spatial arrangement, temperature, and state of a pure substance when thermal energy is added or removed.
+                                                                                               Use a model to explain that atoms are rearranged during a chemical reaction to form new substances with new properties. Explain that the atoms present in the reactants are all present in the products and thus the total number of atoms is conserved.
+                                                                                                                                                                                                      Apply scientific principles of energy and heat transfer to design, construct, and test a device to minimize or maximize thermal energy transfer.*
+                                                                                                                                                                    Show how the components of a structural system work together to serve a structural function. Provide examples of physical structures and relate their design to their intended use.
+                                                                                                                                                                                                                    Interpret basic weather data to identify patterns in air mass interactions and the relationship of those patterns to local weather.
+                                                      Research and communicate information about how transportation systems are designed to move people and goods using a variety of vehicles and devices. Identify and describe subsystems of a transportation vehicle, including structural, propulsion, guidance, suspension, and control subsystems
+                                                                                                                                                                                                                            Explain the role of gravity in ocean tides, the orbital motions of planets, their moons, and asteroids in the solar system.
+                                                                Construct an argument based on evidence for how asexual reproduction results in offspring with identical genetic information and sexual reproduction results in offspring with genetic variation. Compare and contrast advantages and disadvantages of asexual and sexual reproduction.
+                                                                                                                                            Develop and use a model of the Earth-Sun system to explain the cyclical pattern of seasons, which includes Earth’s tilt and differential intensity of sunlight on different areas of Earth across the year.
+                                                                                                                                                          Construct an explanation based on evidence for how characteristic animal behaviors and specialized plant structures increase the probability of successful reproduction of animals and plants
+                                                                                                                                                                                                    Examine and interpret data to describe the role that human activities have played in causing the rise in global temperatures over the past century.
+                                                                                                                                                             Develop a model to describe that matter and energy are transferred among living and nonliving parts of an ecosystem and that both matter and energy are conserved through these processes.
+                                          Present information that illustrates how a product can be created using basic processes in manufacturing systems, including forming, separating, conditioning, assembling, finishing, quality control, and safety. Compare the advantages and disadvantages of human vs. computer control of these processes.
+                                                                                                                                              Describe how relationships among and between organisms in an ecosystem can be competitive, predatory, parasitic, and mutually beneficial and that these interactions are found across multiple ecosystems
+                                                                                                                                                                                                              Choose and safely use appropriate measuring tools, hand tools, fasteners, and common hand-held power tools used to construct a prototype.
+                                                                                                                                           Use diagrams of a simple wave to explain that (a) a wave has a repeating pattern with a specific amplitude, frequency, and wavelength, and (b) the amplitude of a wave is related to the energy of the wave.
+                                                                                                                                                                                                                                   Analyze data to describe the effect of distance and magnitude of electric charge on the strength of electric forces.
+                                                                                                                                                                             Analyze and interpret evidence from the fossil record to describe organisms and their environment, extinctions, and changes to life forms throughout the history of Earth.
+                                                                                                                                                                                    Use graphical displays to illustrate that Earth and its solar system are one of many in the Milky Way galaxy, which is one of billions of galaxies in the universe.
+                                                                                                                                                                     Obtain and communicate information on how data from past geologic events are analyzed for patterns and used to forecast the location and likelihood of future catastrophic events.
+                                                                                                                                                                                                                                   Analyze data to describe the effect of distance and magnitude of electric charge on the strength of electric forces.
+                                                                                                                                                                                                                            Explain the role of gravity in ocean tides, the orbital motions of planets, their moons, and asteroids in the solar system.
+                                                                                                                                                                                                                              Construct and interpret data and graphs to describe the relationships among kinetic energy, mass, and speed of an object.
+                                                                                                                                                                                                    Examine and interpret data to describe the role that human activities have played in causing the rise in global temperatures over the past century.
+                                                                                                                                                                                    Use the concept of systems engineering to model inputs, processes, outputs, and feedback among components of a transportation, structural, or communication system.
+                                                      Research and communicate information about how transportation systems are designed to move people and goods using a variety of vehicles and devices. Identify and describe subsystems of a transportation vehicle, including structural, propulsion, guidance, suspension, and control subsystems
+                                                                                                                                                                                                              Choose and safely use appropriate measuring tools, hand tools, fasteners, and common hand-held power tools used to construct a prototype.
+                                                                                                                                                                                                                    Interpret basic weather data to identify patterns in air mass interactions and the relationship of those patterns to local weather.
+                                                                                      Conduct an investigation to determine the relationships among the energy transferred, how well the type of matter retains or radiates heat, the mass, and the change in the average kinetic energy of the particles as measured by the temperature of the sample.
+                                                                                                                                              Describe how relationships among and between organisms in an ecosystem can be competitive, predatory, parasitic, and mutually beneficial and that these interactions are found across multiple ecosystems
+                                                                                                                                                             Develop a model to describe that matter and energy are transferred among living and nonliving parts of an ecosystem and that both matter and energy are conserved through these processes.
+                                                                                                                                                                           Analyze data to provide evidence that disruptions (natural or human-made) to any physical or biological component of an ecosystem can lead to shifts in all its populations.
+                                                                                                                                                                     Analyze and interpret data to provide evidence for the effects of periods of abundant and scarce resources on the growth of organisms and the size of populations in an ecosystem.
+                                                                                                                                                         Develop a model to explain how the energy of the Sun and Earth’s gravity drive the cycling of water, including changes of state, as it moves through multiple pathways in Earth’s hydrosphere.
+                                                                                                                                                                                            Plan and conduct an experiment involving exothermic and endothermic chemical reactions to measure and describe the release or absorption of thermal energy.
+                                                                                                                                                                                               Explain the function of a communication system and the role of its components, including a source, encoder, transmitter, receiver, decoder, and storage.
+ pts school% state% school_state_diff grade_level
+   1      87     81                 6           6
+   1      72     70                 2           8
+   1      60     39                21           6
+   3      59     52                 7           7
+   3      34     33                 1           8
+   1      64     42                22           8
+   1      52     52                 0           7
+   2      44     39                 5           8
+   1      67     70                -3           7
+   1      43     35                 8           6
+   1      73     65                 8           8
+   1      34     46               -12           8
+   1      60     70               -10           7
+   1      89     77                12           7
+   1      43     44                -1           7
+   2      49     38                11           8
+   1      89     84                 5           7
+   1      71     52                19           6
+   1      53     54                -1           7
+   1      47     50                -3           8
+   1      83     84                -1           6
+   1      86     68                18           6
+   1      78     75                 3           7
+   1      57     54                 3           6
+   1      79     66                13           7
+   2      72     62                10           6
+   2      83     69                14           8
+   1      57     49                 8           7
+   1      41     32                 9           6
+   1      49     54                -5           8
+   1      72     72                 0           8
+   1      94     84                10           7
+   1      80     69                11           7
+   1      79     67                12           8
+   3      33     27                 6           6
+   1      41     43                -2           7
+   3      43     43                 0           6
+   2      73     59                14           6
+   1      58     59                -1           6
+   1      63     65                -2           6
+   1      47     46                 1           7
+   1      73     75                -2           6
+   1      33     37                -4           7
+   1      73     71                 2           8
+   1      73     59                14           6
+   1      70     62                 8           6
+   1      75     76                -1           6
+   1      51     46                 5           8
+   1      58     54                 4           8
+   1      22     29                -7           8
+   1      40     45                -5           7
+   1      80     77                 3           8
+   3      28     26                 2           6
+   3      35     27                 8           6
+   2      46     48                -2           7
+   1      58     45                13           8
+   2      53     43                10           6
+   1      44     26                18           7
+   1      47     48                -1           8
+   1      33     37                -4           8
+   1      40     35                 5           7
+   1      93     78                15           7
+   1      85     57                28           8
+   1      28     30                -2           7
+   1      75     74                 1           8
+   1      63     76               -13           8
+   3      40     42                -2           7
+   3      35     30                 5           7
+   2      35     38                -3           8
+   1      75     66                 9           7
+   2      34     36                -2           8
+   2      58     58                 0           8
+   1      78     69                 9           8
+   1      70     66                 4           7
+   1      73     71                 2           8
+   1      80     84                -4           7
+   1      53     57                -4           8
+   1      91     85                 6           7
+   1      91     81                10           6
+   1      58     53                 5           6
+   1      64     57                 7           7
+   1      87     82                 5           6
+   1      83     71                12           6
+   1      70     67                 3           7
+   1      57     49                 8           7
+   1      62     64                -2           8
+   2      47     39                 8           7
+   2      64     59                 5           8
+   1      59     50                 9           7
+   1      59     54                 5           7
+   1      72     59                13           6
+   1      67     59                 8           8
+   1      44     35                 9           7
+   1      88     73                15           7
+   1      96     76                20           7
+   1      47     40                 7           7
+   3      56     50                 6           7
+   1      54     42                12           7
+   3      43     39                 4           6
+   2      75     65                10           7
+                                                                                                     item_library_URL
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC709749517
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC719842791
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC725566286
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC709749768
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC633167889
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC722134119
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC632357510
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC633723212
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC291925
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC718677590
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC712448165
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC718679781
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC274002
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC712547540
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC719150035
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC725332664
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC310241
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC630734713
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC265247
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC273936
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC282034
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC291918
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC229371
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC291724
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC814970319
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC719152661
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC633360994
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC803556783
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC723657309
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC723657934
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC723656572
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC719258218
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC292029
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC804368074
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC265278
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC631748218
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC735480271
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC291896
+                  https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC313186
+               https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC804375322
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+                                                                                                                 &lt;NA&gt;
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC905147343&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC632265448&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC903847508&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC633058958&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC816553266&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC905636245&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC630748134&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC633724344&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC718684123&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC803361743&amp;YearCode=2022
+    https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC313192&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC903846698&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC903843363&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC903849539&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC903853728&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC814037351&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC631744146&amp;YearCode=2022
+ https://mcas.digitalitemlibrary.com/home?subject=Science&amp;grades=Grade%208&amp;view=ALL&amp;itemUIN=SC804379456&amp;YearCode=2022</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#STE_DF</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tokenization-p-n" class="level1">
+<h1>Tokenization P-N…</h1>
+<section id="lowerase" class="level2">
+<h2 class="anchored" data-anchor-id="lowerase">lowerase</h2>
+</section>
+<section id="remove-punctation" class="level2">
+<h2 class="anchored" data-anchor-id="remove-punctation">remove punctation</h2>
+</section>
+<section id="remove-stopwords" class="level2">
+<h2 class="anchored" data-anchor-id="remove-stopwords">remove stopwords</h2>
+</section>
+<section id="lemma" class="level2">
+<h2 class="anchored" data-anchor-id="lemma">lemma??</h2>
+</section>
+<section id="n-grams" class="level2">
+<h2 class="anchored" data-anchor-id="n-grams">n-grams?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>STE_item_tokens <span class="ot">&lt;-</span> <span class="fu">tokens</span>(STE_item_corpus)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#print(STE_item_tokens)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to lowercase</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>STE_item_tokens <span class="ot">&lt;-</span> <span class="fu">tokens_tolower</span>(STE_item_tokens)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># remove punctuation and numbers</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>STE_item_tokens <span class="ot">&lt;-</span> <span class="fu">tokens</span>(STE_item_corpus, </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">remove_punct =</span> T,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">remove_numbers =</span> T)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">#print(STE_item_tokens)</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co"># remove stopwords</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>STE_item_tokens1 <span class="ot">&lt;-</span> <span class="fu">tokens_select</span>(STE_item_tokens, </span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">pattern =</span> <span class="fu">stopwords</span>(<span class="st">"en"</span>),</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                     <span class="at">selection =</span> <span class="st">"remove"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="pretextpreprocessing-decisions" class="level1">
+<h1>PreTextPreProcessing Decisions?</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.unsetenv</span>(<span class="st">"GITHUB_PAT"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"matthewjdenny/preText"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Using GitHub PAT from the git credential store.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Skipping install of 'preText' from a github remote, the SHA1 (4d40c44c) has not changed since last install.
+  Use `force = TRUE` to force installation</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(preText)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>preText: Diagnostics to Assess the Effects of Text Preprocessing Decisions
+Version 0.7.2 created on 2021-07-25.
+copyright (c) 2021, Matthew J. Denny, Georgetown University
+                    Arthur Spirling, NYU
+Type vignette('getting_started_with_preText') to get started.
+Development website: https://github.com/matthewjdenny/preText</code></pre>
+</div>
+</div>
+</section>
+<section id="word-cloud" class="level1">
+<h1>Word Cloud</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#dfm_item</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>df_STE_toks<span class="ot">&lt;-</span><span class="fu">dfm</span>(STE_item_tokens1)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>df_STE_toks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Document-feature matrix of: 521 documents, 838 features (98.93% sparse) and 13 docvars.
+       features
+docs    describe material appropriate choice part bridge change particle model
+  text1        1        1           1      1    1      1      0        0     0
+  text2        1        0           0      0    0      0      1        1     1
+  text3        0        0           0      0    0      0      0        0     0
+  text4        1        0           0      0    0      1      1        0     1
+  text5        1        0           0      0    0      0      0        0     1
+  text6        0        0           0      0    0      0      0        0     0
+       features
+docs    show
+  text1    0
+  text2    1
+  text3    0
+  text4    0
+  text5    0
+  text6    0
+[ reached max_ndoc ... 515 more documents, reached max_nfeat ... 828 more features ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">textplot_wordcloud</span>(df_STE_toks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CheckIn2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>STE_worst_item_corpus<span class="ot">&lt;-</span> <span class="fu">corpus_subset</span>(STE_item_corpus, school_state_diff <span class="sc">&lt;</span> <span class="dv">0</span> )</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># remove punctuation and numbers</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>STE_worst_tokens <span class="ot">&lt;-</span> <span class="fu">tokens</span>(STE_worst_item_corpus, </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">remove_punct =</span> T,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">remove_numbers =</span> T)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>STE_worst_tokens<span class="ot">&lt;-</span>STE_worst_tokens <span class="ot">&lt;-</span><span class="fu">tokens_tolower</span>(STE_worst_tokens)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>STE_worst_tokens<span class="ot">&lt;-</span> <span class="fu">tokens_select</span>(STE_worst_tokens, </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">pattern =</span> <span class="fu">stopwords</span>(<span class="st">"en"</span>),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">selection =</span> <span class="st">"remove"</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>df_STE_worst_toks<span class="ot">&lt;-</span><span class="fu">dfm</span>(STE_worst_tokens)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="fu">textplot_wordcloud</span>(df_STE_worst_toks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CheckIn2_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda.textstats)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate readability</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># readability &lt;- textstat_readability(STE_item_corpus, </span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                                     measure = c("Flesch.Kincaid")) </span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># # add in a chapter number</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># readability$grade_level &lt;- c(1:nrow(readability))</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># # look at the dataset</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># head(readability)</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># # plot results</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(readability, aes(x = grade_level, y = Flesch.Kincaid)) +</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_line() + </span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_smooth() + </span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_bw()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

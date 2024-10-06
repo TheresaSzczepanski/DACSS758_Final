@@ -62,3 +62,149 @@ At this phase, you might have more questions than answers. Document all those qu
 3.  The Urrutia and Araya article discussed creating linguistic features using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering if there is a good place for me to read about and understand them as a concept?
 
 4.  The Varinhos article discusses the use of topic modeling. This is something I would be interested in applying. Is there a good place to read about the fundamentals of topic modeling?
+
+# Load Libraries
+
+```{r}
+library(devtools)
+library(ggplot2)
+library(plyr)
+library(quanteda)
+library(quanteda.textstats)
+library("quanteda.textplots")
+library(tidytext)
+library(tidyverse)
+```
+
+# Load Data
+
+```{r}
+STE_DF<-read_csv("STE_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `discipline core idea`, `standard`, `standard desc`, `pts`, `school%`, `state%`, school_state_diff, grade_level, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = as.factor(grade_level))
+  
+
+```
+
+# Create Corpus
+
+```{r}
+STE_item_corpus <-corpus(STE_DF, text_field = "item description")
+
+#print(STE_item)
+
+summary(STE_item_corpus)
+
+#STE_DF
+```
+
+# Tokenization P-N...
+
+## lowerase
+
+## remove punctation
+
+## remove stopwords
+
+## lemma??
+
+## n-grams?
+
+```{r}
+STE_item_tokens <- tokens(STE_item_corpus)
+#print(STE_item_tokens)
+
+# convert to lowercase
+
+STE_item_tokens <- tokens_tolower(STE_item_tokens)
+
+
+
+# remove punctuation and numbers
+STE_item_tokens <- tokens(STE_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+#print(STE_item_tokens)
+
+# remove stopwords
+
+STE_item_tokens1 <- tokens_select(STE_item_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+
+```
+
+# PreTextPreProcessing Decisions?
+
+```{r}
+Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("matthewjdenny/preText")
+library(preText)
+
+```
+
+# Word Cloud
+
+```{r}
+
+
+#dfm_item
+
+df_STE_toks<-dfm(STE_item_tokens1)
+
+
+df_STE_toks
+
+textplot_wordcloud(df_STE_toks)
+
+
+
+
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 0 )
+
+# remove punctuation and numbers
+STE_worst_tokens <- tokens(STE_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
+
+STE_worst_tokens<- tokens_select(STE_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+df_STE_worst_toks<-dfm(STE_worst_tokens)
+
+
+
+
+textplot_wordcloud(df_STE_worst_toks)
+
+```
+
+```{r}
+library(quanteda)
+library(quanteda.textstats)
+library(ggplot2)
+# calculate readability
+# readability <- textstat_readability(STE_item_corpus, 
+#                                     measure = c("Flesch.Kincaid")) 
+# 
+# # add in a chapter number
+# readability$grade_level <- c(1:nrow(readability))
+# 
+# # look at the dataset
+# head(readability)
+# 
+# # plot results
+# ggplot(readability, aes(x = grade_level, y = Flesch.Kincaid)) +
+#   geom_line() + 
+#   geom_smooth() + 
+#   theme_bw()
+```

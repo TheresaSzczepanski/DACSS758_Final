@@ -2,12 +2,14 @@ project:
   type: website
 
 website:
-  title: "DACSS758"
+  title: "DACSS758 Final"
   navbar:
     left:
       - href: CheckIn1.qmd
         text: Check In 1
-      - about.qmd
+      - href: CheckIn2.qmd
+        text: Check In 2
+ 
 
 format:
   html:
