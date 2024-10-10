@@ -14,12 +14,8 @@ In this check-in, you need to \
 \
 Note: Turn in this assignment as a standalone html file. Check the instruction of Assignment 0 for creating a standalone html file.
 
-# Final Project
 
-After reading the articles, think about the final project you want to do in this course, and answer the questions below:
-
-\
-1. What research topic you want to study? Do you have a specific research question?
+# Research Question
 
 I work for a public charter school in Massachusetts. Our students in Grades 5-10 are tested annually in Mathematics, English Language Arts, and Science. I am interested in using the student performance data to identify areas of weakness in our program in terms of curricular alignment. For every question on a given assessment, the state releases an **item description** detailing what was asked of students and the corresponding average score earned by students in our school as well as the average score earned by students across Massachusetts.
 
@@ -38,11 +34,12 @@ Similarly, in Mathematics I have identified specific content reporting categorie
 
 ***H2***: A predictive model of 6th grade student performance on 6th grade Mathematics assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
 
-\
-3. What are some potential data sources?
 
-I can scrape the [Department of Elementary and Secondary Educations' accountability page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&). It includes tables for all Next Generation MCAS tests (beginning in 2018) and text descriptions for all test items. I have actually already done this for the High School Science Exams in my Python course last fall. The structures of the tables are similar for the other exams.
+# Data Sources
 
+I scraped the [Department of Elementary and Secondary Educations' accountability page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&). It includes tables for all Next Generation MCAS tests (beginning in 2018) and text descriptions for all test items. I have actually already done this for the High School Science Exams in my Python course last fall. The structures of the tables are similar for the other exams.
+
+Here is [my folder of Collab notebooks](https://drive.google.com/drive/folders/1zCYUnbFfm-yqdpbM7R1O7iGeLj4kf1jU?usp=sharing) with my Python code for scraping different grade level and subjects. Here is a link to the notebook I used for the [HighSchool Science MCAS](https://colab.research.google.com/drive/1loau1tMkYkROXcua6MMuYMs5NwzI_gv5?usp=drive_link)
 \
 4. Is any of the text-as-data methods you identified in the journal articles may be helpful to your research?
 
@@ -52,16 +49,7 @@ For the Mathematics items, I would also like to use **topic modeling** to identi
 
 For the English Language Arts items, I would like to classify items as to whether or not they require the "synthesis of multiple texts" and whether or not they require the analysis of "text features".
 
-\
-At this phase, you might have more questions than answers. Document all those questions.
 
-1.  I have also downloaded PDFs of all of the released paper-based versions of the MCAS tests. Here is an [example of a Math test](https://www.doe.mass.edu/mcas/2023/release/g5-math.pdf). Do you think it would be possible to parse out the text of each question into a data frame? The question texts themselves would also be interesting to analyze. I was wondering if you think it is an achievable task. If so, I'm curious to see more about how to set up a corpus with texts contained in PDF files.
-
-2.  For any subject and grade level, my data set of text would consist of approximately 200 items and their corresponding text descriptions. Is that large enough?
-
-3.  The Urrutia and Araya article discussed creating linguistic features using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering if there is a good place for me to read about and understand them as a concept?
-
-4.  The Varinhos article discusses the use of topic modeling. This is something I would be interested in applying. Is there a good place to read about the fundamentals of topic modeling?
 
 # Load Libraries
 
@@ -76,13 +64,17 @@ library(tidytext)
 library(tidyverse)
 ```
 
-# Load Data
+# Read-in/Tidy Data
+
+Most of the cleaning was done by me in the process of scraping the tables. 
 
 ```{r}
 STE_DF<-read_csv("STE_all_years_2024.csv")%>%
   select(`item description`, year, number, type, `reporting category`, `discipline core idea`, `standard`, `standard desc`, `pts`, `school%`, `state%`, school_state_diff, grade_level, item_library_URL)%>%
   mutate(number = as.factor(number))%>%
   mutate(grade_level = as.factor(grade_level))
+
+STE_DF
   
 
 ```
@@ -99,51 +91,149 @@ summary(STE_item_corpus)
 #STE_DF
 ```
 
-# Tokenization P-N...
+# PreTextPreProcessing Decisions
 
-## lowerase
+Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient; yet the combination "P-W" had the lowest score of the Pre-text results. I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
 
-## remove punctation
+Given, these results, I will pre-process the data two ways, once using the lowest recommended score and once using methods that I suspect based on my background knowledge of the topic and the individual regression coefficients should not impact the meaning of the text and reduce the number of tokens for analysis:
 
-## remove stopwords
+-   Recommended preText score: "P-W" (remove punctuation and stopwords)
 
-## lemma??
+-   Alternative approach: "P-N-L-3" (remove punctuation, remove numbers, lower case, and n-grams)
 
-## n-grams?
-
-```{r}
-STE_item_tokens <- tokens(STE_item_corpus)
-#print(STE_item_tokens)
-
-# convert to lowercase
-
-STE_item_tokens <- tokens_tolower(STE_item_tokens)
-
-
-
-# remove punctuation and numbers
-STE_item_tokens <- tokens(STE_item_corpus, 
-    remove_punct = T,
-    remove_numbers = T)
-
-#print(STE_item_tokens)
-
-# remove stopwords
-
-STE_item_tokens1 <- tokens_select(STE_item_tokens, 
-                     pattern = stopwords("en"),
-                     selection = "remove")
-
-
-
-```
-
-# PreTextPreProcessing Decisions?
 
 ```{r}
 Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("matthewjdenny/preText")
 library(preText)
+
+```
+
+```{r}
+
+preprocessed_documents <- factorial_preprocessing(
+    STE_item_corpus,
+    use_ngrams = TRUE,
+    infrequent_term_threshold = 0.2,
+    verbose = FALSE)
+```
+
+```{r}
+
+names(preprocessed_documents)
+
+head(preprocessed_documents$choices)
+```
+
+```{r}
+
+preText_results <- preText(
+    preprocessed_documents,
+    dataset_name = "STE MCAS Item Descriptions",
+    distance_method = "cosine",
+    num_comparisons = 20,
+    verbose = FALSE)
+
+
+preText_score_plot(preText_results)
+```
+
+```{r}
+regression_coefficient_plot(preText_results,
+                            remove_intercept = TRUE)
+```
+
+## Tokenization 1: P-W
+
+
+
+```{r}
+## Extract the tokens
+
+STE_item_tokens <- tokens(STE_item_corpus)
+
+print(STE_item_tokens)
+
+```
+
+```{r}
+
+STE_item_tokens1 <- tokens(STE_item_corpus, 
+    remove_punct = T)
+
+STE_item_tokens1 <- tokens_select(STE_item_tokens1,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+print(STE_item_tokens1)
+
+
+
+```
+
+## Tokenization 2: P-N-L
+
+```{r}
+# remove punctuation and numbers
+STE_item_tokens2 <- tokens(STE_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+# lower case
+
+STE_item_tokens2 <- tokens_tolower(STE_item_tokens2)
+
+
+# remove stopwords
+
+print(STE_item_tokens2)
+```
+
+
+
+## lemmatization
+
+```{r}
+
+
+
+```
+
+## n-grams
+
+In the future, I would like to explore word-embeddings and the use of n-grams. For now, here is some exploration with phrase machince and some images of word connections
+```{r}
+Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
+  
+library(phrasemachine)                      
+```
+
+```{r}
+# phrases <- phrasemachine(preprocessed_documents,
+#                          minimum_ngram_length = 2,
+#                          maximum_ngram_length = 3,
+#                          return_phrase_vectors = TRUE,
+#                          return_tag_sequences = TRUE)
+# 
+# # look at some example phrases
+# print(phrases[[1]]$phrases[1:10])
+```
+
+# Create DFM
+
+```{r}
+df_STE_toks2<-dfm(STE_item_tokens2)
+
+df_STE_toks1<-dfm(STE_item_tokens1)
+
+```
+
+
+# Descriptive Analysis
+
+```{r}
+topfeatures(df_STE_toks1, 20)
 
 ```
 
@@ -154,14 +244,13 @@ library(preText)
 
 #dfm_item
 
-df_STE_toks<-dfm(STE_item_tokens1)
 
+textplot_wordcloud(df_STE_toks2)
 
-df_STE_toks
+smaller_dfm <-dfm_trim(df_STE_toks2, min_termfreq = 5)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.1, docfreq_type = "prop")
 
-textplot_wordcloud(df_STE_toks)
-
-
+textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
 
 
 STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 0 )
@@ -187,24 +276,32 @@ df_STE_worst_toks<-dfm(STE_worst_tokens)
 textplot_wordcloud(df_STE_worst_toks)
 
 ```
+# Word Connections/N-grams
 
 ```{r}
-library(quanteda)
-library(quanteda.textstats)
-library(ggplot2)
-# calculate readability
-# readability <- textstat_readability(STE_item_corpus, 
-#                                     measure = c("Flesch.Kincaid")) 
-# 
-# # add in a chapter number
-# readability$grade_level <- c(1:nrow(readability))
-# 
-# # look at the dataset
-# head(readability)
-# 
-# # plot results
-# ggplot(readability, aes(x = grade_level, y = Flesch.Kincaid)) +
-#   geom_line() + 
-#   geom_smooth() + 
-#   theme_bw()
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+smaller_fcm <- fcm(smaller_dfm)
+dim(smaller_fcm)
+
+# compute size weight for vertices in network
+size <- log(colSums(smaller_fcm))
+
+# create plot
+textplot_network(smaller_fcm, vertex_size = size/ max(size) * 3)
 ```
+
+
+
+# Questions
+
+\
+At this phase, you might have more questions than answers. Document all those questions.
+
+1.  I have also downloaded PDFs of all of the released paper-based versions of the MCAS tests. Here is an [example of a Math test](https://www.doe.mass.edu/mcas/2023/release/g5-math.pdf). Do you think it would be possible to parse out the text of each question into a data frame? The question texts themselves would also be interesting to analyze. I was wondering if you think it is an achievable task. If so, I'm curious to see more about how to set up a corpus with texts contained in PDF files.
+
+2.  For any subject and grade level, my data set of text would consist of approximately 200 items and their corresponding text descriptions. Is that large enough?
+
+3.  The Urrutia and Araya article discussed creating linguistic features using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering if there is a good place for me to read about and understand them as a concept?
+
+4.  The Varinhos article discusses the use of topic modeling. This is something I would be interested in applying. Is there a good place to read about the fundamentals of topic modeling?
