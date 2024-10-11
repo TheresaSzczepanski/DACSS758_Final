@@ -30,9 +30,9 @@ Similarly, in Mathematics I have identified specific content reporting categorie
 
 ***Hypotheses***:
 
-***H1***: A predictive model of 7th grade student performance on 7th grade English Language Arts assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
+***H1***: A predictive model of student performance on Grade 5-10 English Language Arts MCAS assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
 
-***H2***: A predictive model of 6th grade student performance on 6th grade Mathematics assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
+***H2***: A predictive model of  grade student performance on 6th grade Mathematics assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
 
 
 # Data Sources
@@ -60,13 +60,21 @@ library(plyr)
 library(quanteda)
 library(quanteda.textstats)
 library("quanteda.textplots")
+library(RColorBrewer)
 library(tidytext)
 library(tidyverse)
+library(hrbrthemes)
+library(viridis)
+library(ggpubr)
+library(purrr)
+library(plotly)
 ```
 
 # Read-in/Tidy Data
 
-Most of the cleaning was done by me in the process of scraping the tables. 
+Most of the cleaning was done by me in the process of scraping the tables, which is included in the Python collab notebook files linked above.
+
+## STE Data Frames
 
 ```{r}
 STE_DF<-read_csv("STE_all_years_2024.csv")%>%
@@ -79,7 +87,66 @@ STE_DF
 
 ```
 
-# Create Corpus
+## ELA Data Frames
+
+```{r}
+
+ELA_G5_DF<-read_csv("G5_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 5)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G5_DF
+
+
+ELA_G6_DF<-read_csv("G6_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 6)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G6_DF
+
+ELA_G7_DF<-read_csv("G7_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 7)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G7_DF
+
+ELA_G8_DF<-read_csv("G8_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 8)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G8_DF
+
+
+ELA_G10_DF<-read_csv("G10_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 10)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G10_DF
+
+ELA_DF<-rbind(ELA_G5_DF, ELA_G6_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G7_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G8_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G10_DF)
+
+ELA_DF<-ELA_DF%>%
+  filter(`reporting category` == "RE"| `reporting category` == "LA")
+
+```
+# Science, Technology, and Engineering Exam (STE) Exam
+## Create Corpus
 
 ```{r}
 STE_item_corpus <-corpus(STE_DF, text_field = "item description")
@@ -91,7 +158,7 @@ summary(STE_item_corpus)
 #STE_DF
 ```
 
-# PreTextPreProcessing Decisions
+## PreTextPreProcessing Decisions
 
 Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient; yet the combination "P-W" had the lowest score of the Pre-text results. I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
 
@@ -143,7 +210,7 @@ regression_coefficient_plot(preText_results,
                             remove_intercept = TRUE)
 ```
 
-## Tokenization 1: P-W
+### Tokenization 1: P-W
 
 
 
@@ -171,13 +238,17 @@ print(STE_item_tokens1)
 
 ```
 
-## Tokenization 2: P-N-L
+### Tokenization 2: P-N-L-W-3
 
 ```{r}
 # remove punctuation and numbers
 STE_item_tokens2 <- tokens(STE_item_corpus, 
     remove_punct = T,
     remove_numbers = T)
+
+STE_item_tokens2 <- tokens_select(STE_item_tokens2,
+                   pattern = stopwords("en"),
+                  selection = "remove")
 
 # lower case
 
@@ -191,17 +262,24 @@ print(STE_item_tokens2)
 
 
 
-## lemmatization
+### lemmatization
+
+When I orginally made word clouds, I noticed object and objects appearing separately as well as model and models. I believe these are important, so I chose to also do lemmatization
 
 ```{r}
+lem_STE_item_tokens2<-tokens_replace(STE_item_tokens2,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
 
+lem_STE_item_tokens2
 
 
 ```
 
 ## n-grams
 
-In the future, I would like to explore word-embeddings and the use of n-grams. For now, here is some exploration with phrase machince and some images of word connections
+In the future, I would like to explore word-embeddings and the use of n-grams. For now, here is some exploration with phrase machine and some images of word connections
+
 ```{r}
 Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
@@ -220,40 +298,16 @@ library(phrasemachine)
 # print(phrases[[1]]$phrases[1:10])
 ```
 
-# Create DFM
+## Create DFMs
 
 ```{r}
-df_STE_toks2<-dfm(STE_item_tokens2)
+df_STE_toks2<-dfm(lem_STE_item_tokens2)
 
 df_STE_toks1<-dfm(STE_item_tokens1)
 
-```
+## Worst performing Items
 
-
-# Descriptive Analysis
-
-```{r}
-topfeatures(df_STE_toks1, 20)
-
-```
-
-# Word Cloud
-
-```{r}
-
-
-#dfm_item
-
-
-textplot_wordcloud(df_STE_toks2)
-
-smaller_dfm <-dfm_trim(df_STE_toks2, min_termfreq = 5)
-smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.1, docfreq_type = "prop")
-
-textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
-
-
-STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 0 )
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 2 )
 
 # remove punctuation and numbers
 STE_worst_tokens <- tokens(STE_worst_item_corpus, 
@@ -268,28 +322,549 @@ STE_worst_tokens<- tokens_select(STE_worst_tokens,
                      pattern = stopwords("en"),
                      selection = "remove")
 
-df_STE_worst_toks<-dfm(STE_worst_tokens)
+lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
+
+df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, docfreq_type = "prop")
+
+```
+
+
+## Descriptive Analysis
+
+```{r}
+topfeatures(df_STE_toks2, 20)
+
+topfeatures(df_STE_toks1, 20)
+
+topfeatures(df_STE_worst_toks_smaller, 20)
+
+```
+## Visualizations
+
+```{r}
+STE_DF
+
+STE_DF%>%
+  filter(grade_level != 9)%>%
+  group_by(`reporting category`)%>%
+  summarize(mean_diff = mean(school_state_diff))
+
+
+STE_DF%>%
+  filter(grade_level != 9)%>%
+  #filter(Course == "STEM"| Course == "Math" & `Reporting Category` == "Geometry")%>%
+  #filter(`Cluster` != "Convert like measurement units within a given measurement system.")%>%
+  #filter(`Cluster` != "Geometric measurement: Understand concepts of volume and relate volume to multiplication and to addition.")%>%
+  #filter(`year` == 2024 | year == 2019)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("MS STE MCAS: Student Performance by Reporting Category") +
+    xlab("")#+
+
+
+STE_DF%>%
+  #filter(grade_level != 9)%>%
+  #filter(Course == "STEM"| Course == "Math" & `Reporting Category` == "Geometry")%>%
+  #filter(`Cluster` != "Convert like measurement units within a given measurement system.")%>%
+  #filter(`Cluster` != "Geometric measurement: Understand concepts of volume and relate volume to multiplication and to addition.")%>%
+  #filter(`year` == 2024 | year == 2019)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("MS STE MCAS: Student Performance by Reporting Category") +
+    xlab("")#+
+  
+
+
+```
+
+### Word Cloud
+
+```{r}
+
+
+#dfm_item
+
+
+textplot_wordcloud(df_STE_toks2)
+
+smaller_dfm <-dfm_trim(df_STE_toks2, min_termfreq = 10)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.06, docfreq_type = "prop")
+
+textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
+```
+
+### Examine text visuals on worst-performing questions
+```{r}
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 2 )
+
+# remove punctuation and numbers
+STE_worst_tokens <- tokens(STE_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
+
+STE_worst_tokens<- tokens_select(STE_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
+
+df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .06, docfreq_type = "prop")
+
+## to do make this smaller
 
 
 
 
 textplot_wordcloud(df_STE_worst_toks)
+textplot_wordcloud(df_STE_worst_toks_smaller)
 
 ```
-# Word Connections/N-grams
+
+
+### Examine text visual on best-performing questions
+```{r}
+STE_best_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff > 2 )
+
+# remove punctuation and numbers
+STE_best_tokens <- tokens(STE_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_best_tokens<-STE_best_tokens <-tokens_tolower(STE_best_tokens)
+
+STE_best_tokens<- tokens_select(STE_best_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_best_tokens<-tokens_replace(STE_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_best_toks<-dfm(lem_STE_best_tokens)
+
+df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .06, docfreq_type = "prop")
+
+## to do make this smaller
+
+
+
+
+textplot_wordcloud(df_STE_best_toks)
+textplot_wordcloud(df_STE_best_toks_smaller)
+
+```
+
+
+## Word Connections/N-grams
+
+### Word connections for worst items
+
+```{r}
+
+dim(df_STE_worst_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_worst_toks_smaller))
+
+# create plot
+textplot_network(df_STE_worst_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+### Word connections for best items
+
+```{r}
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+
+dim(df_STE_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_best_toks_smaller))
+
+# create plot
+textplot_network(df_STE_best_toks_smaller, vertex_size = size/ max(size) * 3)
+
+
+
+
+```
+
+## Word connections for all items
 
 ```{r}
 
 # check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
 smaller_fcm <- fcm(smaller_dfm)
-dim(smaller_fcm)
+dim(df_STE_best_toks_smaller)
 
 # compute size weight for vertices in network
 size <- log(colSums(smaller_fcm))
 
 # create plot
-textplot_network(smaller_fcm, vertex_size = size/ max(size) * 3)
+textplot_network(smaller_dfm, vertex_size = size/ max(size) * 3)
 ```
+## MS only
+
+### Worst Items
+
+```{r}
+STE_MS_item_corpus<- corpus_subset(STE_item_corpus, grade_level != 9 )
+
+STE_MS_worst_item_corpus<-corpus_subset(STE_MS_item_corpus, school_state_diff < 2)
+
+# remove punctuation and numbers
+STE_MS_worst_tokens <- tokens(STE_MS_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+STE_MS_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_MS_worst_tokens)
+
+STE_MS_worst_tokens<- tokens_select(STE_MS_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_MS_worst_tokens<-tokens_replace(STE_MS_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+
+
+df_STE_MS_worst_toks<-dfm(lem_STE_MS_worst_tokens)
+
+df_STE_MS_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, docfreq_type = "prop")
+
+textplot_wordcloud(df_STE_MS_worst_toks)
+textplot_wordcloud(df_STE_MS_worst_toks_smaller)
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+#smaller_fcm <- fcm(smaller_dfm)
+dim(df_STE_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(smaller_fcm))
+
+# create plot
+textplot_network(smaller_dfm, vertex_size = size/ max(size) * 3)
+
+```
+## Worst Items
+```{r}
+
+
+STE_MS_best_item_corpus<-corpus_subset(STE_MS_item_corpus, school_state_diff < 2)
+
+# remove punctuation and numbers
+STE_MS_best_tokens <- tokens(STE_MS_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+STE_MS_best_tokens<-STE_best_tokens <-tokens_tolower(STE_MS_best_tokens)
+
+STE_MS_best_tokens<- tokens_select(STE_MS_best_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_MS_best_tokens<-tokens_replace(STE_MS_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+
+
+df_STE_MS_best_toks<-dfm(lem_STE_MS_best_tokens)
+
+df_STE_MS_best_toks_smaller<-dfm_trim(df_STE_MS_best_toks, min_docfreq = .06, docfreq_type = "prop")
+
+textplot_wordcloud(df_STE_MS_best_toks)
+textplot_wordcloud(df_STE_MS_best_toks_smaller)
+
+df_STE_MS_best_toks_smaller
+
+dim(df_STE_MS_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_MS_best_toks_smaller))
+
+# create plot
+textplot_network(df_STE_MS_best_toks_smaller, vertex_size = size/ max(size) * 3)
+
+```
+
+
+
+
+# English, Language Arts Exam
+## Create Corpus
+
+```{r}
+ELA_item_corpus <-corpus(ELA_DF, text_field = "item description")
+
+#print(ELA_item)
+
+summary(ELA_item_corpus)
+
+#ELA_DF
+```
+
+## PreTextPreProcessing Decisions
+
+Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient; yet the combination "P-W" had the lowest score of the Pre-text results. I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
+
+Given, these results, I will pre-process the data two ways, once using the lowest recommended score and once using methods that I suspect based on my background knowledge of the topic and the individual regression coefficients should not impact the meaning of the text and reduce the number of tokens for analysis:
+
+-   Recommended preText score: "N-W-L" (remove numbers, stop words, lowercase)
+
+-   Alternative approach: "P-N-W-L" and Lemmatization (remove punctuation, remove numbers, lower case, and lemmatization)
+
+
+```{r}
+Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("matthewjdenny/preText")
+library(preText)
+
+```
+
+```{r}
+
+preprocessed_documents <- factorial_preprocessing(
+    ELA_item_corpus,
+    use_ngrams = TRUE,
+    infrequent_term_threshold = 0.2,
+    verbose = FALSE)
+```
+
+```{r}
+
+names(preprocessed_documents)
+
+head(preprocessed_documents$choices)
+```
+
+```{r}
+
+preText_results <- preText(
+    preprocessed_documents,
+    dataset_name = "STE MCAS Item Descriptions",
+    distance_method = "cosine",
+    num_comparisons = 20,
+    verbose = FALSE)
+
+
+preText_score_plot(preText_results)
+```
+
+```{r}
+regression_coefficient_plot(preText_results,
+                            remove_intercept = TRUE)
+```
+
+### Tokenization 1: N-L-W
+
+```{r}
+## Extract the tokens
+
+ELA_item_tokens <- tokens(ELA_item_corpus)
+
+print(ELA_item_tokens)
+
+```
+
+```{r}
+
+ELA_item_tokens1 <- tokens(ELA_item_corpus, 
+    remove_numbers = T)
+
+
+ELA_item_tokens1 <- tokens_tolower(ELA_item_tokens1)
+
+ELA_item_tokens1 <- tokens_select(ELA_item_tokens1,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+print(ELA_item_tokens1)
+
+
+
+```
+
+### Tokenization 2: P-N-L-W & Lemmatization
+
+```{r}
+# remove punctuation and numbers
+ELA_item_tokens2 <- tokens(ELA_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+# remove stopwords
+
+ELA_item_tokens2 <- tokens_select(ELA_item_tokens2,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+# lower case
+
+ELA_item_tokens2 <- tokens_tolower(ELA_item_tokens2)
+
+
+
+
+print(ELA_item_tokens2)
+```
+
+
+
+### lemmatization
+
+When I orginally made word clouds, I noticed object and objects appearing separately as well as model and models. I believe these are important, so I chose to also do lemmatization
+
+```{r}
+lem_ELA_item_tokens2<-tokens_replace(ELA_item_tokens2,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+lem_ELA_item_tokens2
+
+
+```
+## Create DFMs
+
+```{r}
+df_ELA_toks2<-dfm(lem_ELA_item_tokens2)
+
+df_ELA_toks1<-dfm(ELA_item_tokens1)
+
+## Worst performing Items
+
+ELA_worst_item_corpus<- corpus_subset(ELA_item_corpus, school_state_diff < 2 )
+
+# remove punctuation and numbers
+ELA_worst_tokens <- tokens(ELA_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+ELA_worst_tokens <- tokens_tolower(ELA_worst_tokens)
+
+
+ELA_worst_tokens <-  tokens_select(ELA_worst_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_ELA_worst_tokens<-tokens_replace(ELA_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_ELA_worst_tokens<-dfm(lem_ELA_worst_tokens)
+df_ELA_worst_toks_smaller<- dfm_trim(df_ELA_worst_tokens, min_docfreq = 0.03, docfreq_type = "prop")
+
+```
+
+## Descriptive Analysis
+
+```{r}
+topfeatures(df_ELA_toks2, 20)
+
+topfeatures(df_ELA_toks1, 20)
+
+topfeatures(df_ELA_worst_toks_smaller, 20)
+
+```
+## Visualizations
+
+```{r}
+ELA_DF
+
+ELA_DF%>%
+  group_by(`reporting category`)%>%
+  summarize(mean_diff = mean(school_state_diff))
+
+
+ELA_DF%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle(" ELA MCAS: Student Performance by Reporting Category") +
+    xlab("")#+
+
+
+ELA_DF%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`Cluster`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("ELA MCAS: Student Performance by Reporting Category") +
+    xlab("")#+
+  
+
+
+```
+
+### Word Cloud
+
+```{r}
+#dfm_item
+textplot_wordcloud(df_ELA_toks2)
+
+smaller_dfm <-dfm_trim(df_ELA_toks2, min_termfreq = 10)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.03, docfreq_type = "prop")
+
+textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
+```
+
+### Examine text visuals on worst-performing questions
+```{r}
+### Word connections for worst items
+
+dim(df_ELA_worst_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_ELA_worst_toks_smaller))
+
+# create plot
+textplot_network(df_ELA_worst_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
 
 
 
