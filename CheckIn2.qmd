@@ -1324,7 +1324,7 @@ ELA_DF%>%
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
     ggtitle("ELA MCAS: Student Performance by Language Cluster and Text Type") #+
-    xlab("")#+
+    #xlab("")#+
 
 
 
