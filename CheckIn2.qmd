@@ -2,35 +2,101 @@
 title: "Check in 2"
 pagetitle: CheckIn2.qmd
 author: "Theresa Szczepanski"
+format:
+  html:
+    embed-resoures: true
+    self-contained-math: true
+    df-print: paged
+    # toc: true
+    # code-fold: true
+    # code-copy: true
+    # code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 # Research Question
 
-I work for a public charter school in Massachusetts. Our students in Grades 5-10 are tested annually in Mathematics, English Language Arts, and Science. I am interested in using the student performance data to identify areas of weakness in our program in terms of curricular alignment. For every question on a given assessment, the state releases an **item description** detailing what was asked of students and the corresponding average score earned by students in our school as well as the average score earned by students across Massachusetts.
+I work for a public charter school in Massachusetts. Our students in
+Grades 5-10 are tested annually in Mathematics, English Language Arts,
+and Science. I am interested in using the student performance data to
+identify areas of weakness in our program in terms of curricular
+alignment. For every question on a given assessment, the state releases
+an **item description** detailing what was asked of students and the
+corresponding average score earned by students in our school as well as
+the average score earned by students across Massachusetts.
 
-***My research question is***: "Can test item descriptions on MCAS assessments be mined to extract features associated with student performance trends?"
+***My research question is***: "Can test item descriptions on MCAS
+assessments be mined to extract features associated with student
+performance trends?"
 
 # Hypothesis
 
-I have already found statistically significant patterns in student performance associated with an item's content reporting category in every subject and grade level at our school.
+I have already found statistically significant patterns in student
+performance associated with an item's content reporting category in
+every subject and grade level at our school.
 
-In Mathematics I have identified specific content reporting categories that are relative weaknesses at different grade levels; however, this does not take into account the differences in questions like those Uurrutia and Araya classified in open-ended Math prompts. I would be curious to see if our students are weaker in items that ask them to evaluate an expression (apply technical skills in algebra) vs. construct or interpret a mathematical model (conceptual understanding) vs. applying technical algebraic/numeric skills in an applied setting (mathematical modeling). This would be very interesting information for teachers.
+In Mathematics I have identified specific content reporting categories
+that are relative weaknesses at different grade levels; however, this
+does not take into account the differences in questions like those
+Uurrutia and Araya classified in open-ended Math prompts. I would be
+curious to see if our students are weaker in items that ask them to
+evaluate an expression (apply technical skills in algebra) vs. construct
+or interpret a mathematical model (conceptual understanding) vs.
+applying technical algebraic/numeric skills in an applied setting
+(mathematical modeling). This would be very interesting information for
+teachers.
 
-When interviewing one of our experienced teachers who has historical success with student achievement in English Language Arts (ELA), she identified specific things that she believes all kids need to practice for success with (ELA), such as "synthesizing multiple texts", "reading non-fiction", and "identifying text features". These are requirements in questions that can be mined from item descriptions but not from an item's reporting category or standard description. Our students have historically performed weaker on the 7th grade English Language Arts exam than on the 6th and 8th grade exams. This suggests a curricular issue. I've already identified reporting categories in which our students have performed relatively weaker on this assessment. I suspect that within these reporting categories there exist patterns to the types of questions or tasks that our students struggle with. This could provide valuable information for teachers to adjust their instruction and instructional materials.
+When interviewing one of our experienced teachers who has historical
+success with student achievement in English Language Arts (ELA), she
+identified specific things that she believes all kids need to practice
+for success with (ELA), such as "synthesizing multiple texts", "reading
+non-fiction", and "identifying text features". These are requirements in
+questions that can be mined from item descriptions but not from an
+item's reporting category or standard description. Our students have
+historically performed weaker on the 7th grade English Language Arts
+exam than on the 6th and 8th grade exams. This suggests a curricular
+issue. I've already identified reporting categories in which our
+students have performed relatively weaker on this assessment. I suspect
+that within these reporting categories there exist patterns to the types
+of questions or tasks that our students struggle with. This could
+provide valuable information for teachers to adjust their instruction
+and instructional materials.
 
 ***Hypotheses***:
 
-***H1***: A predictive model of student performance on Grade 5-10 Mathematics MCAS assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
+***H1***: A predictive model of student performance on Grade 5-10
+Mathematics MCAS assessment items that includes regressors taken from
+the test item descriptions will outperform a baseline predictive model
+that includes only a given test item's content reporting category.
 
-***H2***: A predictive model of student performance on Grade 5-10 English Language Arts MCAS assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
+***H2***: A predictive model of student performance on Grade 5-10
+English Language Arts MCAS assessment items that includes regressors
+taken from the test item descriptions will outperform a baseline
+predictive model that includes only a given test item's content
+reporting category.
 
-***H3***: A predictive model of student performance on Grade 5-8 grade Science assessment items that includes regressors taken from the test item descriptions will outperform a baseline predictive model that includes only a given test item's content reporting category.
+***H3***: A predictive model of student performance on Grade 5-8 grade
+Science assessment items that includes regressors taken from the test
+item descriptions will outperform a baseline predictive model that
+includes only a given test item's content reporting category.
 
 # Data Sources
 
-I scraped the [Department of Elementary and Secondary Educations' accountability page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&). It includes tables for all Next Generation MCAS tests (beginning in 2018) and text descriptions for all test items. I have actually already done this for the High School Science Exams in my Python course last fall. The structures of the tables are similar for the other exams.
+I scraped the [Department of Elementary and Secondary Educations'
+accountability
+page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&).
+It includes tables for all Next Generation MCAS tests (beginning in
+2018) and text descriptions for all test items. I have actually already
+done this for the High School Science Exams in my Python course last
+fall. The structures of the tables are similar for the other exams.
 
-Here is [my folder of Collab notebooks](https://drive.google.com/drive/folders/1zCYUnbFfm-yqdpbM7R1O7iGeLj4kf1jU?usp=sharing) with my Python code for scraping different grade level and subjects. Here is a link to the notebook I used for the [HighSchool Science MCAS](https://colab.research.google.com/drive/1loau1tMkYkROXcua6MMuYMs5NwzI_gv5?usp=drive_link)\
+Here is [my folder of Collab
+notebooks](https://drive.google.com/drive/folders/1zCYUnbFfm-yqdpbM7R1O7iGeLj4kf1jU?usp=sharing)
+with my Python code for scraping different grade level and subjects.
+Here is a link to the notebook I used for the [HighSchool Science
+MCAS](https://colab.research.google.com/drive/1loau1tMkYkROXcua6MMuYMs5NwzI_gv5?usp=drive_link)\
 
 -   Math Corpus: 1010 Documents (item descriptions)
 
@@ -38,11 +104,26 @@ Here is [my folder of Collab notebooks](https://drive.google.com/drive/folders/1
 
 -   ELA Corpus: 693 Documents
 
-In Uurrutia and Araya's paper, they used ***classification*** to categorize open-ended mathematics questions into different types. I would like to classify the MCAS questions into different categories using the item descriptions.
+In Uurrutia and Araya's paper, they used ***classification*** to
+categorize open-ended mathematics questions into different types. I
+would like to classify the MCAS questions into different categories
+using the item descriptions.
 
-For the Mathematics items, I would also like to use **topic modeling** to identify different topics within a given content reporting category. For example, Grade 6 students are assessed in the category *Geometry* on their ability to "Solve real-world and mathematical problems involving area, surface area, and volume." I would like to parse out if there are distinctions between their performance on tasks involving *area* versus tasks involving *volume*. Being able to classify a problem as an *area* versus *volume* problem would allow me to do this. On a broader level, I would like to distinguish between items that ask students to apply technical or *computational* skills versus constructing or interpreting models (*conceptual understanding*).
+For the Mathematics items, I would also like to use **topic modeling**
+to identify different topics within a given content reporting category.
+For example, Grade 6 students are assessed in the category *Geometry* on
+their ability to "Solve real-world and mathematical problems involving
+area, surface area, and volume." I would like to parse out if there are
+distinctions between their performance on tasks involving *area* versus
+tasks involving *volume*. Being able to classify a problem as an *area*
+versus *volume* problem would allow me to do this. On a broader level, I
+would like to distinguish between items that ask students to apply
+technical or *computational* skills versus constructing or interpreting
+models (*conceptual understanding*).
 
-For the English Language Arts items, I would like to classify items as to whether or not they require the "synthesis of multiple texts" and whether or not they require the analysis of "text features".
+For the English Language Arts items, I would like to classify items as
+to whether or not they require the "synthesis of multiple texts" and
+whether or not they require the analysis of "text features".
 
 # Load Libraries
 
@@ -65,7 +146,9 @@ library(plotly)
 
 # Read-in/Tidy Data
 
-Most of the cleaning was done by me in the process of scraping the tables, which is included in the Python collab notebook files linked above.
+Most of the cleaning was done by me in the process of scraping the
+tables, which is included in the Python collab notebook files linked
+above.
 
 ## STE Data Frames
 
@@ -203,13 +286,29 @@ Math_DF
 
 For each exam I followed a similar approach:
 
-1.  Create a dataframe of all of the item descriptions and features across all grade levels and subjects. I kept as annotations all of the features provided by the state which include: `Year, Standard, Reporting Category, Cluster (sub category), Pts, State%, School%,`and`Type`(open response or selected response).
+1.  Create a dataframe of all of the item descriptions and features
+    across all grade levels and subjects. I kept as annotations all of
+    the features provided by the state which include:
+    `Year, Standard, Reporting Category, Cluster (sub category), Pts, State%, School%,`and`Type`(open
+    response or selected response).
 
-2.  Using `preText`I looked for recommendations via the lowest score after running `factorial_preprocessing` and selected tokens accordingly. Interestingly, this recommended to not remove stop words in the Math and Science corpa. I believe this is perhaps because of the key logical role words like "and" ,"but", "not", and "or" play. These stop words do dominate the text desciptions though. Because of this, I also created a second set of tokens that included the removal of stopwords.
+2.  Using `preText`I looked for recommendations via the lowest score
+    after running `factorial_preprocessing` and selected tokens
+    accordingly. Interestingly, this recommended to not remove stop
+    words in the Math and Science corpa. I believe this is perhaps
+    because of the key logical role words like "and" ,"but", "not", and
+    "or" play. These stop words do dominate the text desciptions though.
+    Because of this, I also created a second set of tokens that included
+    the removal of stopwords. Also, whenever there was a recommendation
+    to use stemming, I instead used lemmatization
 
-3.  Create subset document matrices for the items that students performed the **best** on and a matrix for the items that student performed the **worst** on.
+3.  Create subset document matrices for the items that students
+    performed the **best** on and a matrix for the items that student
+    performed the **worst** on.
 
-4.  Create visuals of the word connections for all item descriptions as well as for the items descriptions in the **best** and **worst** stubsets to explore differences.
+4.  Create visuals of the word connections for all item descriptions as
+    well as for the items descriptions in the **best** and **worst**
+    stubsets to explore differences.
 
 # Math Exam
 
@@ -227,55 +326,72 @@ summary(Math_item_corpus)
 
 ## PreTextPreProcessing Decisions
 
-Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient.
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient.
 
-I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
+I can see how key logical words like "not", "and", and "or", which are
+also stop words can have a significant impact on the meaning of an exam
+question. Perhaps, because each individual text is so small and the
+texts are designed for assessing content skills and are not narrative
+text, the stop words play more significant roles?
 
-Given, these results, I will pre-process the data two ways, once using the lowest recommended score, **N,** but also going lowercase as I can't see how this has an effect on anything and has a correlation coefficient of 0, and once using methods that I suspect based on my background knowledge of the topic and the individual regression coefficients should not impact the meaning of the text and reduce the number of tokens for analysis:
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score, **N,** but also going lowercase as I can't
+see how this has an effect on anything and has a correlation coefficient
+of 0, and once using methods that I suspect based on my background
+knowledge of the topic and the individual regression coefficients should
+not impact the meaning of the text and reduce the number of tokens for
+analysis:
 
 -   Recommended preText score: "N-L" (remove punctuation and lowercase)
 
--   Alternative approach: "P-N-L-3" (remove punctuation, remove numbers, lower case, and n-grams)
+-   Alternative approach: "P-N-L-3" (remove punctuation, remove numbers,
+    lower case, and n-grams)
+
+![](MathPretext)
+
+![](MathPretextCoef)
 
 ```{r}
-Sys.unsetenv("GITHUB_PAT")
-devtools::install_github("matthewjdenny/preText")
-library(preText)
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
 
 ```
 
 ```{r}
 
-preprocessed_documents_math <- factorial_preprocessing(
-    Math_item_corpus,
-    use_ngrams = TRUE,
-    infrequent_term_threshold = 0.2,
-    verbose = FALSE)
+# preprocessed_documents_math <- factorial_preprocessing(
+#     Math_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
 ```
 
 ```{r}
 
-#names(preprocessed_documents_math)
-
-head(preprocessed_documents_math$choices)
+# #names(preprocessed_documents_math)
+# 
+# head(preprocessed_documents_math$choices)
 ```
 
 ```{r}
-
-preText_results <- preText(
-    preprocessed_documents_math,
-    dataset_name = "Math MCAS Item Descriptions",
-    distance_method = "cosine",
-    num_comparisons = 20,
-    verbose = FALSE)
-
-
-preText_score_plot(preText_results)
+# 
+# preText_results <- preText(
+#     preprocessed_documents_math,
+#     dataset_name = "Math MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
 ```
 
 ```{r}
-regression_coefficient_plot(preText_results,
-                            remove_intercept = TRUE)
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
 ```
 
 ### Tokenization 1: N-L
@@ -423,9 +539,18 @@ topfeatures(df_Math_best_toks_smaller, 20)
 
 ## Visualizations
 
-When I made vizualizations using the tokens that did not remove the stop words, the stop words for so dominant. Thus for the remainder of my visualizations I used my tokens that had stop words removed.
+When I made vizualizations using the tokens that did not remove the stop
+words, the stop words for so dominant. Thus for the remainder of my
+visualizations I used my tokens that had stop words removed.
 
-I found it particularly interesting when I saw the connections on the worst performing subset vs. the best performing subset. There appears to be a theme of identifying equivalent expressions that only appears in the worst subset. Solving "real-world" problems; i.e. Modeling appears strongly in both our best and worst subset. This makes me curious if there are certain mathematical topics where our students are struggling with the applied problems. I will hopefully be able to explore this with topic modeling in the future.
+I found it particularly interesting when I saw the connections on the
+worst performing subset vs. the best performing subset. There appears to
+be a theme of identifying equivalent expressions that only appears in
+the worst subset. Solving "real-world" problems; i.e. Modeling appears
+strongly in both our best and worst subset. This makes me curious if
+there are certain mathematical topics where our students are struggling
+with the applied problems. I will hopefully be able to explore this with
+topic modeling in the future.
 
 ### Word Cloud
 
@@ -501,28 +626,45 @@ summary(STE_item_corpus)
 
 ## PreTextPreProcessing Decisions
 
-Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient; yet the combination "P-W" had the lowest score of the Pre-text results. I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient; yet the combination "P-W" had
+the lowest score of the Pre-text results. I can see how key logical
+words like "not", "and", and "or", which are also stop words can have a
+significant impact on the meaning of an exam question. Perhaps, because
+each individual text is so small and the texts are designed for
+assessing content skills and are not narrative text, the stop words play
+more significant roles?
 
-Given, these results, I will pre-process the data two ways, once using the lowest recommended score and once using methods that I suspect based on my background knowledge of the topic and the individual regression coefficients should not impact the meaning of the text and reduce the number of tokens for analysis:
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score and once using methods that I suspect based
+on my background knowledge of the topic and the individual regression
+coefficients should not impact the meaning of the text and reduce the
+number of tokens for analysis:
 
 -   Recommended preText score: "P-W" (remove punctuation and stopwords)
 
--   Alternative approach: "P-N-L-W" + Lemmatization (remove punctuation, remove numbers, lower case, remove stopwords and lemmatization)
+-   Alternative approach: "P-N-L-W" + Lemmatization (remove punctuation,
+    remove numbers, lower case, remove stopwords and lemmatization)
+
+    ![](STEPretext)
+
+![](STEPretextCoef)
 
 ```{r}
-Sys.unsetenv("GITHUB_PAT")
-devtools::install_github("matthewjdenny/preText")
-library(preText)
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
 
 ```
 
 ```{r}
-
-preprocessed_documents_STE <- factorial_preprocessing(
-    STE_item_corpus,
-    use_ngrams = TRUE,
-    infrequent_term_threshold = 0.2,
-    verbose = FALSE)
+# 
+# preprocessed_documents_STE <- factorial_preprocessing(
+#     STE_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
 ```
 
 ```{r}
@@ -534,20 +676,20 @@ preprocessed_documents_STE <- factorial_preprocessing(
 
 ```{r}
 
-preText_results <- preText(
-    preprocessed_documents_STE,
-    dataset_name = "STE MCAS Item Descriptions",
-    distance_method = "cosine",
-    num_comparisons = 20,
-    verbose = FALSE)
-
-
-preText_score_plot(preText_results)
+# preText_results <- preText(
+#     preprocessed_documents_STE,
+#     dataset_name = "STE MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
 ```
 
 ```{r}
-regression_coefficient_plot(preText_results,
-                            remove_intercept = TRUE)
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
 ```
 
 ### Tokenization 1: P-W
@@ -600,7 +742,9 @@ print(STE_item_tokens2)
 
 ### lemmatization
 
-When I originally made word clouds, I noticed object and objects appearing separately as well as model and models. I believe these are important, so I chose to also do lemmatization
+When I originally made word clouds, I noticed object and objects
+appearing separately as well as model and models. I believe these are
+important, so I chose to also do lemmatization
 
 ```{r}
 lem_STE_item_tokens2<-tokens_replace(STE_item_tokens2,
@@ -743,7 +887,16 @@ topfeatures(df_STE_MS_best_toks_smaller, 20)
 
 ## Visualizations
 
-It was evident that the worst item tokens seem to largely represent text of items in the physical sciences. Our 9th grade students take a science exam that is only on Physics and as you can see below, they have performed weaker against their peers in the state compared to Rising Tide students at other grade levels. It would therefore, be worth exploring the worst items for Middle School (5th-8th grade) students. When I look at the Mifdle School student performance by Reporting Category, one of their weakest categories appears to be Physical Sciences. So this is also contributing to the dominance of Physical Science terms in the worst items tokens.
+It was evident that the worst item tokens seem to largely represent text
+of items in the physical sciences. Our 9th grade students take a science
+exam that is only on Physics and as you can see below, they have
+performed weaker against their peers in the state compared to Rising
+Tide students at other grade levels. It would therefore, be worth
+exploring the worst items for Middle School (5th-8th grade) students.
+When I look at the Mifdle School student performance by Reporting
+Category, one of their weakest categories appears to be Physical
+Sciences. So this is also contributing to the dominance of Physical
+Science terms in the worst items tokens.
 
 ```{r}
 #STE_DF
@@ -816,7 +969,10 @@ STE_DF%>%
 
 ### Word Cloud
 
-The word cloud has Physical science words larger than other subjects. This also suggests a need to explore the Middle School separately as the 5-8th grade exams give equal weight to Physical Sciences, Life Science, Earth Science, and Technology and Engineering.
+The word cloud has Physical science words larger than other subjects.
+This also suggests a need to explore the Middle School separately as the
+5-8th grade exams give equal weight to Physical Sciences, Life Science,
+Earth Science, and Technology and Engineering.
 
 ```{r}
 
@@ -1000,60 +1156,82 @@ summary(ELA_item_corpus)
 #ELA_DF
 ```
 
-## PreTextPreProcessing Decisions
+## PreText PreProcessing Decisions
 
-Before completing the pre-processing process, I examined the different choices using pre-Text. I was surprised to see that removing stopwords had a positive correlation coefficient; yet the combination "P-W" had the lowest score of the Pre-text results. I can see how key logical words like "not", "and", and "or", which are also stop words can have a significant impact on the meaning of an exam question. Perhaps, because each individual text is so small and the texts are designed for assessing content skills and are not narrative text, the stop words play more significant roles?
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient; yet the combination "P-W" had
+the lowest score of the Pre-text results. I can see how key logical
+words like "not", "and", and "or", which are also stop words can have a
+significant impact on the meaning of an exam question. Perhaps, because
+each individual text is so small and the texts are designed for
+assessing content skills and are not narrative text, the stop words play
+more significant roles?
 
-Given, these results, I will pre-process the data two ways, once using the lowest recommended score and once using methods that I suspect based on my background knowledge of the topic and the individual regression coefficients should not impact the meaning of the text and reduce the number of tokens for analysis:
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score and once using methods that I suspect based
+on my background knowledge of the topic and the individual regression
+coefficients should not impact the meaning of the text and reduce the
+number of tokens for analysis:
 
--   Recommended preText score: "L-W-Lemma" (remove stop words, lowercase, Lemmatization)
+-   Recommended preText score: "S-W-3" (remove stop words,
+    Lemmatization/Stemming)
 
--   Alternative approach: "P-N-W-L" and Lemmatization (remove punctuation, remove numbers, lower case, and lemmatization)
+-   Alternative approach: "P-N-W-L" and Lemmatization (remove
+    punctuation, remove numbers, lower case, and lemmatization)
 
-Also, due to teacher input I am also creating a subcorpus of items that assessed Literature and items that assessed Informational text. Teachers describe having to change their approach to teaching these things and students having different weaknesses according to text type.
+![](ELAPretextCoef)
+
+Also, due to teacher input I am also creating a subcorpus of items that
+assessed Literature and items that assessed Informational text. Teachers
+describe having to change their approach to teaching these things and
+students having different weaknesses according to text type.
 
 ```{r}
-Sys.unsetenv("GITHUB_PAT")
-devtools::install_github("matthewjdenny/preText")
-library(preText)
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
 
 ```
 
 ```{r}
 
-preprocessed_documents_ELA <- factorial_preprocessing(
-    ELA_item_corpus,
-    use_ngrams = TRUE,
-    infrequent_term_threshold = 0.2,
-    verbose = FALSE)
+# preprocessed_documents_ELA <- factorial_preprocessing(
+#     ELA_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
 ```
 
 ```{r}
 
-names(preprocessed_documents_ELA)
-
-head(preprocessed_documents_ELA$choices)
+# names(preprocessed_documents_ELA)
+# 
+# head(preprocessed_documents_ELA$choices)
 ```
 
 ```{r}
 
-preText_results <- preText(
-    preprocessed_documents_ELA,
-    dataset_name = "ELA MCAS Item Descriptions",
-    distance_method = "cosine",
-    num_comparisons = 20,
-    verbose = FALSE)
-
-
-preText_score_plot(preText_results)
+# preText_results <- preText(
+#     preprocessed_documents_ELA,
+#     dataset_name = "ELA MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
 ```
 
 ```{r}
-regression_coefficient_plot(preText_results,
-                            remove_intercept = TRUE)
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
 ```
 
 ### Tokenization 1: L-W-Lemma
+
+Once we learn more about n-grams, I would like to also incorporate
+n-grams in my preprocessing.
 
 ```{r}
 ## Extract the tokens
@@ -1274,8 +1452,7 @@ ELA_DF%>%
       legend.position="none",
       plot.title = element_text(size=11)
     ) +
-    ggtitle(" ELA MCAS: Student Performance by Reporting Category") #+
-    xlab("")#+
+    ggtitle(" ELA MCAS: Student Performance by Reporting Category") 
 
 
 ELA_DF%>%
@@ -1288,10 +1465,7 @@ ELA_DF%>%
       #legend.position="none",
       plot.title = element_text(size=11)
     ) +
-    ggtitle("ELA MCAS: Student Performance by Reporting Category") #+
-  #+
-  #  labs(caption = "Literature") 
-   # xlab("")#+
+    ggtitle("ELA MCAS: Student Performance by Reporting Category")
   
 
 ELA_DF%>%
@@ -1307,7 +1481,7 @@ ELA_DF%>%
     ) +
     ggtitle("ELA MCAS: Student Performance by Reporting Category") +
     labs(caption = "Literature") 
-    #xlab("")#+
+
 
 
 
@@ -1323,8 +1497,7 @@ ELA_DF%>%
       plot.title = element_text(size=11),
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
-    ggtitle("ELA MCAS: Student Performance by Language Cluster and Text Type") #+
-    #xlab("")#+
+    ggtitle("ELA MCAS: Student Performance by Language Cluster and Text Type") 
 
 
 
@@ -1410,14 +1583,24 @@ textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 
 # Questions
 
 \
-At this phase, you might have more questions than answers. Document all those questions.
+At this phase, you might have more questions than answers. Document all
+those questions.
 
-1.  Do you think that the sizes of the text corpa I have are now large enough?
+1.  Do you think that the sizes of the text corpa I have are now large
+    enough?
 
-2.  Do you have thoughts on the inclusion/exclusion of stop words. I went against what pretext recommended and found removing stopwords to still be helpful for the Science and Math descriptions. Is that ok?
+2.  Do you have thoughts on the inclusion/exclusion of stop words. I
+    went against what pretext recommended and found removing stopwords
+    to still be helpful for the Science and Math descriptions. Is that
+    ok?
 
 I'm just leaving these prior questions here for me as a reference
 
-1.  The Urrutia and Araya article discussed creating linguistic features using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering if there is a good place for me to read about and understand them as a concept?
+1.  The Urrutia and Araya article discussed creating linguistic features
+    using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering
+    if there is a good place for me to read about and understand them as
+    a concept?
 
-2.  The Varinhos article discusses the use of topic modeling. This is something I would be interested in applying. Is there a good place to read about the fundamentals of topic modeling?
+2.  The Varinhos article discusses the use of topic modeling. This is
+    something I would be interested in applying. Is there a good place
+    to read about the fundamentals of topic modeling?
