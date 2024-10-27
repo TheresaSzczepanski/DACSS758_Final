@@ -1,0 +1,1875 @@
+---
+title: "Check in 3"
+pagetitle: CheckIn3.qmd
+author: "Theresa Szczepanski"
+format:
+  html:
+    embed-resoures: true
+    self-contained-math: true
+    df-print: paged
+    toc: true
+    code-fold: true
+    code-copy: true
+    code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Research Question
+
+I work for a public charter school in Massachusetts. Our students in
+Grades 5-10 are tested annually in Mathematics, English Language Arts,
+and Science. I am interested in using the student performance data to
+identify areas of weakness in our program in terms of curricular
+alignment. For every question on a given assessment, the state releases
+an **item description** detailing what was asked of students and the
+corresponding average score earned by students in our school as well as
+the average score earned by students across Massachusetts.
+
+***My research question is***: "Can test item descriptions on MCAS
+assessments be mined to extract features associated with student
+performance trends?"
+
+# Hypothesis
+
+I have already found statistically significant patterns in student
+performance associated with an item's content reporting category in
+every subject and grade level at our school.
+
+In Mathematics, I have identified specific content reporting categories
+that are relative weaknesses at different grade levels; however, this
+does not take into account the differences in questions like those
+Uurrutia and Araya classified in open-ended Math prompts. I would be
+curious to see if our students are weaker in items that ask them to
+evaluate an expression (apply technical skills in algebra) vs. construct
+or interpret a mathematical model (conceptual understanding) vs.
+applying technical algebraic/numeric skills in an applied setting
+(mathematical modeling). This would be very interesting information for
+teachers.
+
+When interviewing one of our experienced teachers who has historical
+success with student achievement in English Language Arts (ELA), she
+identified specific things that she believes all kids need to practice
+for success with (ELA), such as "synthesizing multiple texts", "reading
+non-fiction", and "identifying text features". These are requirements in
+questions that can be mined from item descriptions but not from an
+item's reporting category or standard description. Our students have
+historically performed weaker on the 7th grade English Language Arts
+exam than on the 6th and 8th grade exams. This suggests a curricular
+issue. I've already identified reporting categories in which our
+students have performed relatively weaker on this assessment. I suspect
+that within these reporting categories there exist patterns to the types
+of questions or tasks that our students struggle with. This could
+provide valuable information for teachers to adjust their instruction
+and instructional materials.
+
+***Hypotheses***:
+
+***H1***: A predictive model of student performance on Grade 5-10
+Mathematics MCAS assessment items that includes regressors taken from
+the test item descriptions will outperform a baseline predictive model
+that includes only a given test item's content reporting category.
+
+***H2***: A predictive model of student performance on Grade 5-10
+English Language Arts MCAS assessment items that includes regressors
+taken from the test item descriptions will outperform a baseline
+predictive model that includes only a given test item's content
+reporting category.
+
+***H3***: A predictive model of student performance on Grade 5-8 grade
+Science assessment items that includes regressors taken from the test
+item descriptions will outperform a baseline predictive model that
+includes only a given test item's content reporting category.
+
+# Data Sources
+
+I scraped the [Department of Elementary and Secondary Educations'
+accountability
+page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&).
+It includes tables for all Next Generation MCAS tests (beginning in
+2018) and text descriptions for all test items. I have actually already
+done this for the High School Science Exams in my Python course last
+fall. The structures of the tables are similar for the other exams.
+
+Here is [my folder of Collab
+notebooks](https://drive.google.com/drive/folders/1zCYUnbFfm-yqdpbM7R1O7iGeLj4kf1jU?usp=sharing)
+with my Python code for scraping different grade level and subjects.
+Here is a link to the notebook I used for the [HighSchool Science
+MCAS](https://colab.research.google.com/drive/1loau1tMkYkROXcua6MMuYMs5NwzI_gv5?usp=drive_link)\
+
+-   Math Corpus: 1010 Documents (item descriptions)
+
+-   STE Corpus: 510 Documents, MS Only: 398 Documents
+
+-   ELA Corpus: 693 Documents
+
+In Uurrutia and Araya's paper, they used ***classification*** to
+categorize open-ended mathematics questions into different types. I
+would like to classify the MCAS questions into different categories
+using the item descriptions.
+
+For the Mathematics items, I would also like to use **topic modeling**
+to identify different topics within a given content reporting category.
+For example, Grade 6 students are assessed in the category *Geometry* on
+their ability to "Solve real-world and mathematical problems involving
+area, surface area, and volume." I would like to parse out if there are
+distinctions between their performance on tasks involving *area* versus
+tasks involving *volume*. Being able to classify a problem as an *area*
+versus *volume* problem would allow me to do this. On a broader level, I
+would like to distinguish between items that ask students to apply
+technical or *computational* skills versus constructing or interpreting
+models (*conceptual understanding*).
+
+For the English Language Arts items, I would like to classify items as
+to whether or not they require the "synthesis of multiple texts" and
+whether or not they require the analysis of "text features".
+
+# Load Libraries
+
+```{r}
+library(devtools)
+library(ggplot2)
+library(plyr)
+library(quanteda)
+library(quanteda.textstats)
+library("quanteda.textplots")
+library(RColorBrewer)
+library(tidytext)
+library(tidyverse)
+library(hrbrthemes)
+library(viridis)
+library(ggpubr)
+library(purrr)
+library(plotly)
+```
+
+# Read-in/Tidy Data
+
+Most of the cleaning was done by me in the process of scraping the
+tables, which is included in [my folder of Python Collab
+notebooks.](https://drive.google.com/drive/folders/1zCYUnbFfm-yqdpbM7R1O7iGeLj4kf1jU?usp=sharing)
+
+## STE Data Frames
+
+```{r}
+STE_DF<-read_csv("STE_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `discipline core idea`, `standard`, `standard desc`, `pts`, `school%`, `state%`, school_state_diff, grade_level, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = as.factor(grade_level))
+
+STE_DF
+  
+
+```
+
+## ELA Data Frames
+
+```{r}
+
+ELA_G5_DF<-read_csv("G5_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 5)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G5_DF
+
+
+ELA_G6_DF<-read_csv("G6_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 6)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G6_DF
+
+ELA_G7_DF<-read_csv("G7_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 7)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G7_DF
+
+ELA_G8_DF<-read_csv("G8_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 8)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G8_DF
+
+
+ELA_G10_DF<-read_csv("G10_ELA_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `Cluster`, `text_type`, `standard`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 10)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#ELA_G10_DF
+
+ELA_DF<-rbind(ELA_G5_DF, ELA_G6_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G7_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G8_DF)
+
+ELA_DF<-rbind(ELA_DF, ELA_G10_DF)
+
+ELA_DF<-ELA_DF%>%
+  filter(`type` == "SR")
+
+```
+
+## Math Data Frames
+
+```{r}
+
+
+
+Math_G5_DF<-read_csv("G5_Math_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 5)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#Math_G5_DF
+
+
+Math_G6_DF<-read_csv("G6_Math_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 6)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#Math_G6_DF
+
+Math_G7_DF<-read_csv("G7_Math_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 7)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#Math_G7_DF
+
+Math_G8_DF<-read_csv("G8_Math_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 8)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#Math_G8_DF
+
+
+Math_G10_DF<-read_csv("G10_Math_all_years_2024.csv")%>%
+  select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
+  mutate(number = as.factor(number))%>%
+  mutate(grade_level = 10)%>%
+  mutate(grade_level = as.factor(grade_level))
+
+#Math_G10_DF
+
+Math_DF<-rbind(Math_G5_DF, Math_G6_DF)
+
+Math_DF<-rbind(Math_DF, Math_G7_DF)
+
+Math_DF<-rbind(Math_DF, Math_G8_DF)
+
+Math_DF<-rbind(Math_DF, Math_G10_DF)
+
+Math_DF
+
+```
+
+# PreProcessing Approach
+
+For each exam I followed a similar approach:
+
+1.  Create a dataframe of all of the item descriptions and features
+    across all grade levels and subjects. I kept as annotations all of
+    the features provided by the state which include:
+    `Year, Standard, Reporting Category, Cluster (sub category), Pts, State%, School%,`and`Type`(open
+    response or selected response).
+
+2.  Using `preText`, I looked for recommendations via the lowest score
+    after running `factorial_preprocessing` and selected tokens
+    accordingly. Interestingly, this recommended to not remove stop
+    words in the Math and Science corpa. I believe this is perhaps
+    because of the key logical role words like "and" ,"but", "not", and
+    "or" play. These stop words do dominate the text descriptions
+    though. Because of this, I also created a second set of tokens that
+    included the removal of stopwords. Also, whenever there was a
+    recommendation to use stemming, I instead used lemmatization.
+
+3.  Create subset document matrices for the items that students
+    performed the **best** on and a matrix for the items that student
+    performed the **worst** on.
+
+4.  Create visuals of the word connections for all item descriptions as
+    well as for the items descriptions in the **best** and **worst**
+    subsets to explore differences.
+
+5.  Using n-grams, identify key phrases from the item descriptions.
+
+6.  Create a dictionary that uses these key phrases to tag an item as
+    including any of the following
+
+    -   `modeling`: A modeling problem
+
+    -   `apply_division`: Problem requiring the use of division and
+        division facts
+
+    -   `patterns_algebra`: Problem requiring the manipulation of
+        equivalent algebraic or numeric expressions
+
+7.  Update the `Math_DF` to include the three new features from the
+    Math_dictionary for each of the documents to use as a feature for
+    Machine Learning.
+
+# Math Exam
+
+## Create Corpus
+
+```{r}
+Math_item_corpus <-corpus(Math_DF, text_field = "item description")
+
+#print(Math_item)
+
+(summary(Math_item_corpus))
+
+
+
+Math_DF
+```
+
+## PreTextPreProcessing Decisions
+
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient.
+
+I can see how key logical words like "not", "and", and "or", which are
+also stop words can have a significant impact on the meaning of an exam
+question. Perhaps, because each individual text is so small and the
+texts are designed for assessing content skills and are not narrative
+text, the stop words play more significant roles?
+
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score, **N,** but also going lowercase as I can't
+see how this has an effect on anything and has a correlation coefficient
+of 0, and once using methods that I suspect based on my background
+knowledge of the topic and the individual regression coefficients should
+not impact the meaning of the text and reduce the number of tokens for
+analysis:
+
+-   Recommended preText score: "N-L" (remove punctuation and lowercase)
+
+-   Alternative approach: "P-N-L-3" (remove punctuation, remove numbers,
+    lower case, and n-grams)
+
+![](MathPretext)
+
+![](MathPretextCoef)
+
+```{r}
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
+
+```
+
+```{r}
+
+# preprocessed_documents_math <- factorial_preprocessing(
+#     Math_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
+```
+
+```{r}
+
+# #names(preprocessed_documents_math)
+# 
+# head(preprocessed_documents_math$choices)
+```
+
+```{r}
+# 
+# preText_results <- preText(
+#     preprocessed_documents_math,
+#     dataset_name = "Math MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
+```
+
+```{r}
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
+```
+
+### Tokenization 1: N-L
+
+When I used the recommended approach from Pre-Text of "N-L" the
+stopwords were dominating the texts. So, I did not perform further
+analysis with these tokens.
+
+```{r}
+## Extract the tokens
+
+Math_item_tokens <- tokens(Math_item_corpus)
+
+#print(Math_item_tokens)
+
+```
+
+```{r}
+
+Math_item_tokens1 <- tokens(Math_item_corpus, 
+    remove_numbers = T)
+
+
+Math_item_tokens1 <- tokens_tolower(Math_item_tokens1)
+
+# Math_item_tokens1 <- tokens_select(Math_item_tokens1,
+#                    pattern = stopwords("en"),
+#                   selection = "remove")
+
+print(Math_item_tokens1)
+
+
+
+```
+
+### Tokenization 2: P-N-L-W & Lemmatization
+
+```{r}
+# remove punctuation and numbers
+Math_item_tokens2 <- tokens(Math_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+# remove stopwords
+
+Math_item_tokens2 <- tokens_select(Math_item_tokens2,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+# lower case
+
+Math_item_tokens2 <- tokens_tolower(Math_item_tokens2)
+
+
+
+
+print(Math_item_tokens2)
+```
+
+### lemmatization
+
+```{r}
+lem_Math_item_tokens2<-tokens_replace(Math_item_tokens2,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+lem_Math_item_tokens2
+
+```
+
+## Create DFM
+
+```{r}
+df_Math_toks2<-dfm(lem_Math_item_tokens2)
+
+
+df_Math_toks_smaller<- dfm_trim(df_Math_toks2, min_docfreq = 0.08, docfreq_type = "prop")
+
+
+df_Math_toks2
+
+df_Math_toks_smaller
+
+```
+
+### n-grams
+
+```{r}
+Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
+  
+library(phrasemachine) 
+
+
+```
+
+```{r}
+
+documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[215:222]
+
+#documents_weak_items
+
+phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
+                         maximum_ngram_length = 4,
+                         return_phrase_vectors = TRUE,
+                         return_tag_sequences = TRUE)
+
+# look at some example phrases
+print(phrases[[1]]$phrases[1:20])
+
+```
+
+## Worst performing Items
+
+```{r}
+Math_worst_item_corpus<- corpus_subset(Math_item_corpus, school_state_diff < 2 )
+
+# remove punctuation and numbers
+Math_worst_tokens <- tokens(Math_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+Math_worst_tokens <- tokens_tolower(Math_worst_tokens)
+
+
+Math_worst_tokens <-  tokens_select(Math_worst_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_Math_worst_tokens<-tokens_replace(Math_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_Math_worst_tokens<-dfm(lem_Math_worst_tokens)
+df_Math_worst_toks_smaller<- dfm_trim(df_Math_worst_tokens, min_docfreq = 0.08, docfreq_type = "prop")
+
+```
+
+## Best performing Items
+
+```{r}
+Math_best_item_corpus<- corpus_subset(Math_item_corpus, school_state_diff > 5 )
+
+# remove punctuation and numbers
+Math_best_tokens <- tokens(Math_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+Math_best_tokens <- tokens_tolower(Math_best_tokens)
+
+
+Math_best_tokens <-  tokens_select(Math_best_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_Math_best_tokens<-tokens_replace(Math_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_Math_best_tokens<-dfm(lem_Math_best_tokens)
+df_Math_best_toks_smaller<- dfm_trim(df_Math_best_tokens, min_docfreq = 0.08, docfreq_type = "prop")
+
+```
+
+
+
+## Descriptive Analysis
+
+```{r}
+topfeatures(df_Math_toks2, 20)
+
+#topfeatures(df_Math_toks1, 20)
+
+topfeatures(df_Math_worst_toks_smaller, 20)
+
+
+topfeatures(df_Math_best_toks_smaller, 20)
+```
+
+## Visualizations
+
+
+I found it particularly interesting when I saw the connections on the
+worst performing subset vs. the best performing subset. There appears to
+be a theme of identifying equivalent expressions that only appears in
+the worst subset. Solving "real-world" problems; i.e. Modeling, appears
+strongly in both our best and worst subset. This makes me curious if
+there are certain mathematical topics where our students are struggling
+with the modeling problems. I will hopefully be able to explore this with
+topic modeling in the future.
+
+Because of these patterns, I will create a dictionary to classify identify if an item requires `Modeling`, `apply_division`, or `patterns_algebra`.
+
+### Word Cloud
+
+```{r}
+#dfm_item
+textplot_wordcloud(df_Math_toks2)
+
+smaller_dfm <-dfm_trim(df_Math_toks2, min_termfreq = 10)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.05, docfreq_type = "prop")
+
+
+
+```
+
+### Worst-performing questions
+
+```{r}
+### Word connections for worst items
+
+dim(df_Math_worst_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_Math_worst_toks_smaller))
+
+# create plot
+textplot_network(df_Math_worst_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+### Best-performing questions
+
+```{r}
+### Word connections for best items
+
+dim(df_Math_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_Math_best_toks_smaller))
+
+# create plot
+textplot_network(df_Math_best_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+### All questions
+
+```{r}
+### Word connections for all items
+
+dim(df_Math_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_Math_toks_smaller))
+
+# create plot
+textplot_network(df_Math_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+## Dictionary to Create New Features
+
+## Dictionary: Key Math Terms:
+
+```{r}
+my_math_dict <- dictionary(list(modeling=c("real-world","context"),             
+              patterns_alg=c("equivalent expression", "eqivalent", "distributive", "distribute", "factor"),
+              apply_division=c("divide","division","quotient")))
+
+my_math_dict
+
+# patterns_alg=c("equivalent expression","radical expression", "rational expression", #"expression", "eqivalent", "distributive", "distribute", "factor")
+```
+
+```{r}
+math_Toks2_mydict <- df_Math_toks2 %>%
+  dfm_lookup(my_math_dict)
+
+tail(math_Toks2_mydict, 10)
+
+df_MathDict <- convert(math_Toks2_mydict, to = "data.frame")
+
+
+
+df_MathDict
+
+#Math_DF<-left_join(df_MathDict, Math_DF, by = "doc_id")
+
+```
+
+```{r}
+mathToksDfm_mydict <- df_Math_worst_tokens %>%
+  dfm_lookup(my_math_dict)
+
+tail(mathToksDfm_mydict, 10)
+
+summary(df_Math_toks2)
+
+```
+```{r}
+Math_DF<-mutate(Math_DF, ID = as.character(row_number()))
+
+Math_DF<-mutate(Math_DF, doc_id = str_trim(paste("text", ID, sep="")))
+
+Math_DF<-left_join(df_MathDict, Math_DF, by = "doc_id")
+
+```
+
+
+```{r}
+Math_DF
+
+```
+## Modeling Visualization
+```{r}
+Math_DF%>%
+  filter(modeling > 0)%>%
+  filter(grade_level == 10)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G10 MCAS: Student Performance Modeling by Reporting Category")
+
+
+Math_DF%>%
+  filter(modeling > 0)%>%
+  filter(grade_level == 5)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G5 MCAS: Student Performance Modeling by Reporting Category")
+
+Math_DF%>%
+  filter(modeling == 0)%>%
+  filter(grade_level == 5)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G5 MCAS: Student Performance Modeling by Reporting Category")
+
+
+Math_DF%>%
+  filter(modeling > 0)%>%
+  filter(grade_level == 7)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G7 MCAS: Student Performance Modeling by Reporting Category")
+
+Math_DF%>%
+  filter(modeling == 0)%>%
+  filter(grade_level == 7)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G7 MCAS: Student Performance Modeling by Reporting Category")
+
+
+
+
+
+```
+```{r}
+Math_DF%>%
+  filter(grade_level ==5)%>%
+  filter(`reporting category` == "GE")%>%
+  filter(modeling > 0)
+
+
+```
+
+
+## G6 Patterns_Alg and Apply_Div
+
+```{r}
+
+Math_DF%>%
+  #filter(patterns_alg > 0)%>%
+  mutate(patterns_alg = as.factor(patterns_alg))%>%
+  filter(grade_level == 6)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`patterns_alg`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G6 MCAS: Student Performance Patterns Algebra and Reporting Category")
+
+
+Math_DF%>%
+  #filter(patterns_alg > 0)%>%
+  mutate(apply_division = as.factor(apply_division))%>%
+  filter(grade_level == 6)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`apply_division`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G6 MCAS: Student Performance Apply_Division and Reporting Category")
+
+
+```
+
+
+## G10 Patterns_Alg and Modeling
+
+```{r}
+
+Math_DF%>%
+  #filter(patterns_alg > 0)%>%
+  mutate(patterns_alg = as.factor(patterns_alg))%>%
+  filter(grade_level == 10)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`patterns_alg`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G10 MCAS: Student Performance Patterns Algebra and Reporting Category")
+
+
+Math_DF%>%
+  #filter(patterns_alg > 0)%>%
+  mutate(modeling = as.factor(modeling))%>%
+  filter(grade_level == 10)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G10 MCAS: Student Performance Modeling and Reporting Category")
+
+
+```
+
+
+# Science, Technology, and Engineering Exam (STE) Exam
+
+## Create Corpus
+
+```{r}
+STE_item_corpus <-corpus(STE_DF, text_field = "item description")
+
+#print(STE_item)
+
+summary(STE_item_corpus)
+
+#STE_DF
+```
+
+## PreTextPreProcessing Decisions
+
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient; yet the combination "P-W" had
+the lowest score of the Pre-text results. I can see how key logical
+words like "not", "and", and "or", which are also stop words can have a
+significant impact on the meaning of an exam question. Perhaps, because
+each individual text is so small and the texts are designed for
+assessing content skills and are not narrative text, the stop words play
+more significant roles?
+
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score and once using methods that I suspect based
+on my background knowledge of the topic and the individual regression
+coefficients should not impact the meaning of the text and reduce the
+number of tokens for analysis:
+
+-   Recommended preText score: "P-W" (remove punctuation and stopwords)
+
+-   Alternative approach: "P-N-L-W" + Lemmatization (remove punctuation,
+    remove numbers, lower case, remove stopwords and lemmatization)
+
+    ![](STEPretext)
+
+![](STEPretextCoef)
+
+```{r}
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
+
+```
+
+```{r}
+# 
+# preprocessed_documents_STE <- factorial_preprocessing(
+#     STE_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
+```
+
+```{r}
+
+#names(preprocessed_documents_STE)
+
+#head(preprocessed_documents_STE$choices)
+```
+
+```{r}
+
+# preText_results <- preText(
+#     preprocessed_documents_STE,
+#     dataset_name = "STE MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
+```
+
+```{r}
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
+```
+
+### Tokenization 1: P-W
+
+```{r}
+## Extract the tokens
+
+STE_item_tokens <- tokens(STE_item_corpus)
+
+print(STE_item_tokens)
+
+```
+
+```{r}
+
+STE_item_tokens1 <- tokens(STE_item_corpus, 
+    remove_punct = T)
+
+STE_item_tokens1 <- tokens_select(STE_item_tokens1,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+print(STE_item_tokens1)
+
+
+
+```
+
+### Tokenization 2: P-N-L-W- Lemmatization
+
+```{r}
+# remove punctuation and numbers
+STE_item_tokens2 <- tokens(STE_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+STE_item_tokens2 <- tokens_select(STE_item_tokens2,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+# lower case
+
+STE_item_tokens2 <- tokens_tolower(STE_item_tokens2)
+
+
+# remove stopwords
+
+print(STE_item_tokens2)
+```
+
+### lemmatization
+
+When I originally made word clouds, I noticed object and objects
+appearing separately as well as model and models. I believe these are
+important, so I chose to also do lemmatization
+
+```{r}
+lem_STE_item_tokens2<-tokens_replace(STE_item_tokens2,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+lem_STE_item_tokens2
+
+
+```
+
+## Create DFMs
+
+```{r}
+df_STE_toks2<-dfm(lem_STE_item_tokens2)
+
+df_STE_toks1<-dfm(STE_item_tokens1)
+
+
+
+```
+
+#### Worst performing Items
+
+```{r}
+
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 2 )
+
+# remove punctuation and numbers
+STE_worst_tokens <- tokens(STE_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
+
+STE_worst_tokens<- tokens_select(STE_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
+
+df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, docfreq_type = "prop")
+
+```
+
+### MS only
+
+#### Worst Items
+
+```{r}
+STE_MS_item_corpus<- corpus_subset(STE_item_corpus, grade_level != 9 )
+
+#summary(STE_MS_item_corpus)
+
+
+STE_MS_worst_item_corpus<-corpus_subset(STE_MS_item_corpus, school_state_diff < 2)
+
+# remove punctuation and numbers
+STE_MS_worst_tokens <- tokens(STE_MS_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+STE_MS_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_MS_worst_tokens)
+
+STE_MS_worst_tokens<- tokens_select(STE_MS_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_MS_worst_tokens<-tokens_replace(STE_MS_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+
+
+df_STE_MS_worst_toks<-dfm(lem_STE_MS_worst_tokens)
+
+df_STE_MS_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, docfreq_type = "prop")
+
+```
+
+#### Best Items
+
+```{r}
+
+STE_MS_best_item_corpus<-corpus_subset(STE_MS_item_corpus, school_state_diff > 5)
+
+
+# remove punctuation and numbers
+STE_MS_best_tokens <- tokens(STE_MS_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+STE_MS_best_tokens<-STE_best_tokens <-tokens_tolower(STE_MS_best_tokens)
+
+STE_MS_best_tokens<- tokens_select(STE_MS_best_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_MS_best_tokens<-tokens_replace(STE_MS_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+
+
+df_STE_MS_best_toks<-dfm(lem_STE_MS_best_tokens)
+
+df_STE_MS_best_toks_smaller<-dfm_trim(df_STE_MS_best_toks, min_docfreq = .06, docfreq_type = "prop")
+
+textplot_wordcloud(df_STE_MS_best_toks)
+textplot_wordcloud(df_STE_MS_best_toks_smaller)
+
+```
+
+## Descriptive Analysis
+
+```{r}
+topfeatures(df_STE_toks2, 20)
+
+topfeatures(df_STE_toks1, 20)
+
+topfeatures(df_STE_worst_toks_smaller, 20)
+
+
+topfeatures(df_STE_MS_worst_toks_smaller, 20)
+
+
+topfeatures(df_STE_MS_best_toks_smaller, 20)
+
+```
+
+## Visualizations
+
+It was evident that the worst item tokens seem to largely represent text
+of items in the physical sciences. Our 9th grade students take a science
+exam that is only on Physics and as you can see below, they have
+performed weaker against their peers in the state compared to Rising
+Tide students at other grade levels. It would therefore, be worth
+exploring the worst items for Middle School (5th-8th grade) students.
+When I look at the Mifdle School student performance by Reporting
+Category, one of their weakest categories appears to be Physical
+Sciences. So this is also contributing to the dominance of Physical
+Science terms in the worst items tokens.
+
+```{r}
+#STE_DF
+
+STE_DF%>%
+  filter(grade_level != 9)%>%
+  group_by(`reporting category`)%>%
+  summarize(mean_diff = mean(school_state_diff))
+
+STE_DF%>%
+  #filter(grade_level != 9)%>%
+  #filter(Course == "STEM"| Course == "Math" & `Reporting Category` == "Geometry")%>%
+  #filter(`Cluster` != "Convert like measurement units within a given measurement system.")%>%
+  #filter(`Cluster` != "Geometric measurement: Understand concepts of volume and relate volume to multiplication and to addition.")%>%
+  #filter(`year` == 2024 | year == 2019)%>%
+  ggplot( aes(x=`grade_level`, y=`school_state_diff`, fill=`grade_level`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("STE MCAS: Student Performance by Grade Level") +
+    xlab("")#+
+
+
+
+STE_DF%>%
+  filter(grade_level != 9)%>%
+  #filter(`year` == 2024 | year == 2019)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("MS STE MCAS: Student Performance by Reporting Category") +
+    xlab("")#+
+
+
+STE_DF%>%
+  filter(grade_level != 9)%>%
+  #filter(Course == "STEM"| Course == "Math" & `Reporting Category` == "Geometry")%>%
+  filter(`reporting category` == "PS")%>%
+  #filter(`Cluster` != "Geometric measurement: Understand concepts of volume and relate volume to multiplication and to addition.")%>%
+  #filter(`year` == 2024 | year == 2019)%>%
+  ggplot( aes(x=`discipline core idea`, y=`school_state_diff`, fill=`discipline core idea`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+     # legend.position="none",
+      axis.text.x=element_blank(),
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("MS STE MCAS: Student Performance in Physical Sciences") +
+    xlab("")#+
+
+
+  
+
+
+```
+
+### Word Cloud
+
+The word cloud has Physical science words larger than other subjects.
+This also suggests a need to explore the Middle School separately as the
+5-8th grade exams give equal weight to Physical Sciences, Life Science,
+Earth Science, and Technology and Engineering.
+
+```{r}
+
+
+#dfm_item
+
+
+textplot_wordcloud(df_STE_toks2)
+
+smaller_dfm <-dfm_trim(df_STE_toks2, min_termfreq = 10)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.06, docfreq_type = "prop")
+
+textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
+```
+
+### Examine text visuals on worst-performing questions
+
+```{r}
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 2 )
+
+# remove punctuation and numbers
+STE_worst_tokens <- tokens(STE_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
+
+STE_worst_tokens<- tokens_select(STE_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
+
+df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .06, docfreq_type = "prop")
+
+## to do make this smaller
+
+
+
+
+textplot_wordcloud(df_STE_worst_toks)
+textplot_wordcloud(df_STE_worst_toks_smaller)
+
+```
+
+### Examine text visual on best-performing questions
+
+```{r}
+STE_best_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff > 2 )
+
+# remove punctuation and numbers
+STE_best_tokens <- tokens(STE_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_best_tokens<-STE_best_tokens <-tokens_tolower(STE_best_tokens)
+
+STE_best_tokens<- tokens_select(STE_best_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_best_tokens<-tokens_replace(STE_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_best_toks<-dfm(lem_STE_best_tokens)
+
+df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .06, docfreq_type = "prop")
+
+## to do make this smaller
+
+
+
+
+textplot_wordcloud(df_STE_best_toks)
+textplot_wordcloud(df_STE_best_toks_smaller)
+
+```
+
+### Word Connections
+
+#### Worst items
+
+```{r}
+
+dim(df_STE_worst_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_worst_toks_smaller))
+
+# create plot
+textplot_network(df_STE_worst_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+#### Best Items
+
+```{r}
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+
+dim(df_STE_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_best_toks_smaller))
+
+# create plot
+textplot_network(df_STE_best_toks_smaller, vertex_size = size/ max(size) * 3)
+
+
+
+
+```
+
+## Word connections for all items
+
+```{r}
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+smaller_fcm <- fcm(smaller_dfm)
+dim(df_STE_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(smaller_fcm))
+
+# create plot
+textplot_network(smaller_dfm, vertex_size = size/ max(size) * 3)
+```
+
+## MS Worst
+
+```{r}
+
+
+# check the dimensions (i.e., the number of rows and the number of columnns) of the matrix we created
+#smaller_fcm <- fcm(smaller_dfm)
+dim(df_STE_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(smaller_fcm))
+
+# create plot
+textplot_network(smaller_dfm, vertex_size = size/ max(size) * 3)
+
+```
+
+## MS Best
+
+```{r}
+#df_STE_MS_best_toks_smaller
+
+dim(df_STE_MS_best_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_STE_MS_best_toks_smaller))
+
+# create plot
+textplot_network(df_STE_MS_best_toks_smaller, vertex_size = size/ max(size) * 3)
+
+```
+
+# English Language Arts Exam
+
+## Create Corpus
+
+```{r}
+ELA_item_corpus <-corpus(ELA_DF, text_field = "item description")
+
+#print(ELA_item)
+
+summary(ELA_item_corpus)
+
+#ELA_DF
+```
+
+## PreText PreProcessing Decisions
+
+Before completing the pre-processing process, I examined the different
+choices using pre-Text. I was surprised to see that removing stopwords
+had a positive correlation coefficient; yet the combination "P-W" had
+the lowest score of the Pre-text results. I can see how key logical
+words like "not", "and", and "or", which are also stop words can have a
+significant impact on the meaning of an exam question. Perhaps, because
+each individual text is so small and the texts are designed for
+assessing content skills and are not narrative text, the stop words play
+more significant roles?
+
+Given, these results, I will pre-process the data two ways, once using
+the lowest recommended score and once using methods that I suspect based
+on my background knowledge of the topic and the individual regression
+coefficients should not impact the meaning of the text and reduce the
+number of tokens for analysis:
+
+-   Recommended preText score: "S-W-3" (remove stop words,
+    Lemmatization/Stemming)
+
+-   Alternative approach: "P-N-W-L" and Lemmatization (remove
+    punctuation, remove numbers, lower case, and lemmatization)
+
+![](ELAPretextCoef)
+
+Also, due to teacher input I am also creating a subcorpus of items that
+assessed Literature and items that assessed Informational text. Teachers
+describe having to change their approach to teaching these things and
+students having different weaknesses according to text type.
+
+```{r}
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("matthewjdenny/preText")
+# library(preText)
+
+```
+
+```{r}
+
+# preprocessed_documents_ELA <- factorial_preprocessing(
+#     ELA_item_corpus,
+#     use_ngrams = TRUE,
+#     infrequent_term_threshold = 0.2,
+#     verbose = FALSE)
+```
+
+```{r}
+
+# names(preprocessed_documents_ELA)
+# 
+# head(preprocessed_documents_ELA$choices)
+```
+
+```{r}
+
+# preText_results <- preText(
+#     preprocessed_documents_ELA,
+#     dataset_name = "ELA MCAS Item Descriptions",
+#     distance_method = "cosine",
+#     num_comparisons = 20,
+#     verbose = FALSE)
+# 
+# 
+# preText_score_plot(preText_results)
+```
+
+```{r}
+# regression_coefficient_plot(preText_results,
+#                             remove_intercept = TRUE)
+```
+
+### Tokenization 1: L-W-Lemma
+
+Once we learn more about n-grams, I would like to also incorporate
+n-grams in my preprocessing.
+
+```{r}
+## Extract the tokens
+
+ELA_item_tokens <- tokens(ELA_item_corpus)
+
+print(ELA_item_tokens)
+
+```
+
+```{r}
+
+ELA_item_tokens1 <- tokens_tolower(ELA_item_tokens)
+
+ELA_item_tokens1 <- tokens_select(ELA_item_tokens1,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+print(ELA_item_tokens1)
+
+
+
+```
+
+### Tokenization 2: P-N-L-W & Lemmatization
+
+```{r}
+# remove punctuation and numbers
+ELA_item_tokens2 <- tokens(ELA_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+# remove stopwords
+
+ELA_item_tokens2 <- tokens_select(ELA_item_tokens2,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+# lower case
+
+ELA_item_tokens2 <- tokens_tolower(ELA_item_tokens2)
+
+
+
+
+print(ELA_item_tokens2)
+```
+
+### lemmatization
+
+```{r}
+lem_ELA_item_tokens2<-tokens_replace(ELA_item_tokens2,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+lem_ELA_item_tokens2
+
+lem_ELA_item_tokens1<-tokens_replace(ELA_item_tokens1,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+lem_ELA_item_tokens1
+
+
+```
+
+## Create DFMs
+
+```{r}
+df_ELA_toks2<-dfm(lem_ELA_item_tokens2)
+
+df_ELA_toks1<-dfm(lem_ELA_item_tokens1)
+
+```
+
+## Worst performing Items
+
+### Literature
+
+```{r}
+ELA_worst_lit_item_corpus<- corpus_subset(ELA_item_corpus, school_state_diff < 2 & text_type == "Literature" )
+
+# remove punctuation and numbers
+ELA_worst_lit_tokens <- tokens(ELA_worst_lit_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+ELA_worst_lit_tokens <- tokens_tolower(ELA_worst_lit_tokens)
+
+
+ELA_worst_lit_tokens <-  tokens_select(ELA_worst_lit_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_ELA_worst_lit_tokens<-tokens_replace(ELA_worst_lit_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_ELA_worst_lit_tokens<-dfm(lem_ELA_worst_lit_tokens)
+df_ELA_worst_lit_toks_smaller<- dfm_trim(df_ELA_worst_lit_tokens, min_docfreq = 0.09, docfreq_type = "prop")
+
+```
+
+### Informational
+
+```{r}
+ELA_worst_inf_item_corpus<- corpus_subset(ELA_item_corpus, school_state_diff < 2 & text_type == "Informational" )
+
+# remove punctuation and numbers
+ELA_worst_inf_tokens <- tokens(ELA_worst_inf_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+ELA_worst_inf_tokens <- tokens_tolower(ELA_worst_inf_tokens)
+
+
+ELA_worst_inf_tokens <-  tokens_select(ELA_worst_inf_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_ELA_worst_inf_tokens<-tokens_replace(ELA_worst_inf_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_ELA_worst_inf_tokens<-dfm(lem_ELA_worst_inf_tokens)
+df_ELA_worst_inf_toks_smaller<- dfm_trim(df_ELA_worst_inf_tokens, min_docfreq = 0.09, docfreq_type = "prop")
+
+```
+
+## Best performing Items
+
+### Literature
+
+```{r}
+ELA_best_lit_item_corpus<- corpus_subset(ELA_item_corpus, school_state_diff > 5 & text_type == "Literature" )
+
+# remove punctuation and numbers
+ELA_best_lit_tokens <- tokens(ELA_best_lit_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+ELA_best_lit_tokens <- tokens_tolower(ELA_best_lit_tokens)
+
+
+ELA_best_lit_tokens <-  tokens_select(ELA_best_lit_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_ELA_best_lit_tokens<-tokens_replace(ELA_best_lit_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_ELA_best_lit_tokens<-dfm(lem_ELA_best_lit_tokens)
+df_ELA_best_lit_toks_smaller<- dfm_trim(df_ELA_best_lit_tokens, min_docfreq = 0.09, docfreq_type = "prop")
+
+```
+
+### Informational
+
+```{r}
+ELA_best_inf_item_corpus<- corpus_subset(ELA_item_corpus, school_state_diff > 5 & text_type == "Informational" )
+
+# remove punctuation and numbers
+ELA_best_inf_tokens <- tokens(ELA_best_inf_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+ELA_best_inf_tokens <- tokens_tolower(ELA_best_inf_tokens)
+
+
+ELA_best_inf_tokens <-  tokens_select(ELA_best_inf_tokens,
+                   pattern = stopwords("en"),
+                  selection = "remove")
+
+lem_ELA_best_inf_tokens<-tokens_replace(ELA_best_inf_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_ELA_best_inf_tokens<-dfm(lem_ELA_best_inf_tokens)
+df_ELA_best_inf_toks_smaller<- dfm_trim(df_ELA_best_inf_tokens, min_docfreq = 0.09, docfreq_type = "prop")
+
+```
+
+## Descriptive Analysis
+
+```{r}
+topfeatures(df_ELA_toks2, 20)
+
+topfeatures(df_ELA_toks1, 20)
+
+topfeatures(df_ELA_worst_lit_toks_smaller, 20)
+topfeatures(df_ELA_best_lit_toks_smaller, 20)
+
+
+topfeatures(df_ELA_best_inf_toks_smaller, 20)
+
+topfeatures(df_ELA_worst_inf_toks_smaller, 20)
+
+```
+
+## Visualizations
+
+```{r}
+#ELA_DF
+
+ELA_DF%>%
+  group_by(`reporting category`)%>%
+  summarize(mean_diff = mean(school_state_diff))
+
+
+ELA_DF%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`text_type`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle(" ELA MCAS: Student Performance by Reporting Category") 
+
+
+ELA_DF%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`Cluster`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("ELA MCAS: Student Performance by Reporting Category")
+  
+
+ELA_DF%>%
+  filter(text_type == "Literature")%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`Cluster`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("ELA MCAS: Student Performance by Reporting Category") +
+    labs(caption = "Literature") 
+
+
+
+
+ELA_DF%>%
+  filter(`reporting category` == "LA")%>%
+  ggplot( aes(x=`Cluster`, y=`school_state_diff`, fill=`text_type`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    ggtitle("ELA MCAS: Student Performance by Language Cluster and Text Type") 
+
+
+
+
+```
+
+### Word Cloud
+
+```{r}
+#dfm_item
+textplot_wordcloud(df_ELA_toks2)
+
+smaller_dfm <-dfm_trim(df_ELA_toks2, min_termfreq = 5)
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.05, docfreq_type = "prop")
+
+textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
+```
+
+### Word Connections
+
+#### Literature
+
+##### Best Items
+
+```{r}
+### Word connections for worst items
+
+dim(df_ELA_best_lit_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_ELA_best_lit_toks_smaller))
+
+# create plot
+textplot_network(df_ELA_best_lit_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+##### Worst Items
+
+```{r}
+### Word connections for worst items
+
+dim(df_ELA_worst_lit_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_ELA_worst_lit_toks_smaller))
+
+# create plot
+textplot_network(df_ELA_worst_lit_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+### Word Connections
+
+#### Informational
+
+##### Visual Best Items
+
+```{r}
+### Word connections for worst items
+
+dim(df_ELA_best_inf_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_ELA_best_inf_toks_smaller))
+
+# create plot
+textplot_network(df_ELA_best_inf_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+##### Worst Items
+
+```{r}
+### Word connections for best items
+
+dim(df_ELA_worst_inf_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_ELA_worst_inf_toks_smaller))
+
+# create plot
+textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+# Questions
+
+\
+At this phase, you might have more questions than answers. Document all
+those questions.
+
+1.  Do you think that the sizes of the text corpa I have are now large
+    enough?
+
+2.  Do you have thoughts on the inclusion/exclusion of stop words. I
+    went against what pretext recommended and found removing stopwords
+    to still be helpful for the Science and Math descriptions. Is that
+    ok?
+
+I'm just leaving these prior questions here for me as a reference
+
+1.  The Urrutia and Araya article discussed creating linguistic features
+    using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering
+    if there is a good place for me to read about and understand them as
+    a concept?
+
+2.  The Varinhos article discusses the use of topic modeling. This is
+    something I would be interested in applying. Is there a good place
+    to read about the fundamentals of topic modeling?
