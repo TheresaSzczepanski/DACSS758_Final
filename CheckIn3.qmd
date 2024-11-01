@@ -42,27 +42,25 @@ that are relative weaknesses at different grade levels; however, this
 does not take into account the differences in questions like those
 Uurrutia and Araya classified in open-ended Math prompts. I would be
 curious to see if our students are weaker in items that ask them to
-evaluate an expression (apply technical skills in algebra) vs. construct
-or interpret a mathematical model (conceptual understanding) vs.
-applying technical algebraic/numeric skills in an applied setting
-(mathematical modeling). This would be very interesting information for
-teachers.
+evaluate an expression (apply technical skills in algebra/numeracy) vs.
+construct or interpret a mathematical model (conceptual understanding).
+This would be very interesting information for teachers.
 
 When interviewing one of our experienced teachers who has historical
 success with student achievement in English Language Arts (ELA), she
 identified specific things that she believes all kids need to practice
-for success with (ELA), such as "synthesizing multiple texts", "reading
-non-fiction", and "identifying text features". These are requirements in
-questions that can be mined from item descriptions but not from an
-item's reporting category or standard description. Our students have
-historically performed weaker on the 7th grade English Language Arts
-exam than on the 6th and 8th grade exams. This suggests a curricular
-issue. I've already identified reporting categories in which our
-students have performed relatively weaker on this assessment. I suspect
-that within these reporting categories there exist patterns to the types
-of questions or tasks that our students struggle with. This could
-provide valuable information for teachers to adjust their instruction
-and instructional materials.
+for success with ELA, namely, "synthesizing multiple texts" and
+"practice at the differences in reading informational text vs.
+literature". These are requirements in questions that can be mined from
+item descriptions but not from an item's reporting category or standard
+description. Our students have historically performed weaker on the 7th
+grade English Language Arts exam than on the 6th and 8th grade exams.
+This suggests a curricular alignment issue. I've already identified
+reporting categories in which our students have performed relatively
+weaker on this assessment. I suspect that within these reporting
+categories there exist patterns to the types of questions or tasks that
+our students struggle with. This could provide valuable information for
+teachers to adjust their instruction and instructional materials.
 
 ***Hypotheses***:
 
@@ -89,7 +87,7 @@ accountability
 page](https://profiles.doe.mass.edu/mcas/mcasitems2.aspx?grade=07&subjectcode=ELA&linkid=10&orgcode=04830000&fycode=2023&orgtypecode=5&).
 It includes tables for all Next Generation MCAS tests (beginning in
 2018) and text descriptions for all test items. I have actually already
-done this for the High School Science Exams in my Python course last
+done this for the High School Science exams in my Python course last
 fall. The structures of the tables are similar for the other exams.
 
 Here is [my folder of Collab
@@ -106,24 +104,17 @@ MCAS](https://colab.research.google.com/drive/1loau1tMkYkROXcua6MMuYMs5NwzI_gv5?
 
 In Uurrutia and Araya's paper, they used ***classification*** to
 categorize open-ended mathematics questions into different types. I
-would like to classify the MCAS questions into different categories
-using the item descriptions.
+would like to use ***dictionaries*** to classify MCAS questions into
+different categories using the item descriptions.
 
-For the Mathematics items, I would also like to use **topic modeling**
-to identify different topics within a given content reporting category.
-For example, Grade 6 students are assessed in the category *Geometry* on
-their ability to "Solve real-world and mathematical problems involving
-area, surface area, and volume." I would like to parse out if there are
-distinctions between their performance on tasks involving *area* versus
-tasks involving *volume*. Being able to classify a problem as an *area*
-versus *volume* problem would allow me to do this. On a broader level, I
-would like to distinguish between items that ask students to apply
-technical or *computational* skills versus constructing or interpreting
-models (*conceptual understanding*).
+Then I would like to use Supervised Machine Learning Methods that
+include the features created from the dictionaries as well as features
+that I extracted from the MCAS reporting tables to predict student
+performance relative to their peers in the state, `RT-State Diff`, on a
+given item.
 
-For the English Language Arts items, I would like to classify items as
-to whether or not they require the "synthesis of multiple texts" and
-whether or not they require the analysis of "text features".
+I would like to use this same approach for the English Language Arts and
+Science exams as well.
 
 # Load Libraries
 
@@ -220,6 +211,8 @@ ELA_DF<-rbind(ELA_DF, ELA_G10_DF)
 ELA_DF<-ELA_DF%>%
   filter(`type` == "SR")
 
+ELA_DF
+
 ```
 
 ## Math Data Frames
@@ -288,19 +281,23 @@ For each exam I followed a similar approach:
 
 1.  Create a dataframe of all of the item descriptions and features
     across all grade levels and subjects. I kept as annotations all of
-    the features provided by the state which include:
-    `Year, Standard, Reporting Category, Cluster (sub category), Pts, State%, School%,`and`Type`(open
-    response or selected response).
+    the features provided by the state which include: `year`,
+    `standard`, `reporting category`, `cluster` (sub category), `pts`,
+    `state%`, `school%`, `school_state_diff`, and`type`(open response or
+    selected response).
 
 2.  Using `preText`, I looked for recommendations via the lowest score
     after running `factorial_preprocessing` and selected tokens
     accordingly. Interestingly, this recommended to not remove stop
-    words in the Math and Science corpa. I believe this is perhaps
+    words in the Math and Science corpora. I believe this is perhaps
     because of the key logical role words like "and" ,"but", "not", and
     "or" play. These stop words do dominate the text descriptions
     though. Because of this, I also created a second set of tokens that
-    included the removal of stopwords. Also, whenever there was a
-    recommendation to use stemming, I instead used lemmatization.
+    included the removal of stopwords that I used for text
+    visualizations and descriptive analysis of text. When applying
+    dictionaries and using machine learning, I will use texts that
+    include stop words. Also, whenever there was a recommendation to use
+    stemming, I instead used lemmatization.
 
 3.  Create subset document matrices for the items that students
     performed the **best** on and a matrix for the items that student
@@ -312,8 +309,10 @@ For each exam I followed a similar approach:
 
 5.  Using n-grams, identify key phrases from the item descriptions.
 
-6.  Create a dictionary that uses these key phrases to tag an item as
-    including any of the following
+6.  Create a dictionary that uses key phrases identified in steps 4 and
+    5 to tag an item as including any of the following
+
+    Math:
 
     -   `modeling`: A modeling problem
 
@@ -323,9 +322,26 @@ For each exam I followed a similar approach:
     -   `patterns_algebra`: Problem requiring the manipulation of
         equivalent algebraic or numeric expressions
 
-7.  Update the `Math_DF` to include the three new features from the
-    Math_dictionary for each of the documents to use as a feature for
-    Machine Learning.
+    ELA:
+
+    -   `poetry`: Students are asked questions involving where the
+        source text is a poem
+
+    -   `figurative_language`: question requiring the analysis of
+        figurative language
+
+    Science:
+    
+    -   `analyze graph`: Students are asked questions involving the analysis
+    of a graph
+    
+    -   `analyze model`: Students are asked questions involving the analysis
+    of a model
+
+
+7.  Update the `Subject_DF` to include the new features identified via
+    the subject area dictionary for each of the documents to use as a
+    feature for Supervised Machine Learning model that will predict `school_state_diff`.
 
 # Math Exam
 
@@ -336,9 +352,7 @@ Math_item_corpus <-corpus(Math_DF, text_field = "item description")
 
 #print(Math_item)
 
-(summary(Math_item_corpus))
-
-
+#(summary(Math_item_corpus))
 
 Math_DF
 ```
@@ -346,7 +360,7 @@ Math_DF
 ## PreTextPreProcessing Decisions
 
 Before completing the pre-processing process, I examined the different
-choices using pre-Text. I was surprised to see that removing stopwords
+choices using pre-Text. I was surprised to see that removing stop words
 had a positive correlation coefficient.
 
 I can see how key logical words like "not", "and", and "or", which are
@@ -358,10 +372,7 @@ text, the stop words play more significant roles?
 Given, these results, I will pre-process the data two ways, once using
 the lowest recommended score, **N,** but also going lowercase as I can't
 see how this has an effect on anything and has a correlation coefficient
-of 0, and once using methods that I suspect based on my background
-knowledge of the topic and the individual regression coefficients should
-not impact the meaning of the text and reduce the number of tokens for
-analysis:
+of 0, and once using methods that includes removing stop words to use for text visualization and simple descriptive summaries of the text:
 
 -   Recommended preText score: "N-L" (remove punctuation and lowercase)
 
@@ -415,9 +426,6 @@ analysis:
 
 ### Tokenization 1: N-L
 
-When I used the recommended approach from Pre-Text of "N-L" the
-stopwords were dominating the texts. So, I did not perform further
-analysis with these tokens.
 
 ```{r}
 ## Extract the tokens
@@ -484,6 +492,18 @@ lem_Math_item_tokens2
 ## Create DFM
 
 ```{r}
+
+df_Math_toks1<-dfm(Math_item_tokens1)
+
+
+df_Math_toks1_smaller<- dfm_trim(df_Math_toks1, min_docfreq = 0.08, docfreq_type = "prop")
+
+
+df_Math_toks1
+
+df_Math_toks1_smaller
+
+
 df_Math_toks2<-dfm(lem_Math_item_tokens2)
 
 
@@ -509,7 +529,7 @@ library(phrasemachine)
 
 ```{r}
 
-documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[215:222]
+documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[26:29]
 
 #documents_weak_items
 
@@ -523,6 +543,10 @@ print(phrases[[1]]$phrases[1:20])
 
 ```
 
+```{r}
+documents_weak_items
+
+```
 ## Worst performing Items
 
 ```{r}
@@ -575,9 +599,9 @@ df_Math_best_toks_smaller<- dfm_trim(df_Math_best_tokens, min_docfreq = 0.08, do
 
 ```
 
-
-
 ## Descriptive Analysis
+
+Interestingly, some words like "determine", "real-world", and "expression" are top features from the Math tokens as a whole ***but***, in the tokens taken only from the worst performing items, the word expression appears ***much*** more frequently than the phrase "real-world", and this is the opposite in our best performing items and the entire corpus. Also, the word graph is a top-feature in the Math corpus and the best performing items but not a top-feature in the worst performing items.
 
 ```{r}
 topfeatures(df_Math_toks2, 20)
@@ -592,28 +616,29 @@ topfeatures(df_Math_best_toks_smaller, 20)
 
 ## Visualizations
 
-
 I found it particularly interesting when I saw the connections on the
 worst performing subset vs. the best performing subset. There appears to
 be a theme of identifying equivalent expressions that only appears in
 the worst subset. Solving "real-world" problems; i.e. Modeling, appears
 strongly in both our best and worst subset. This makes me curious if
 there are certain mathematical topics where our students are struggling
-with the modeling problems. I will hopefully be able to explore this with
-topic modeling in the future.
+with the modeling problems. I will hopefully be able to explore this
+with topic modeling in the future.
 
-Because of these patterns, I will create a dictionary to classify identify if an item requires `Modeling`, `apply_division`, or `patterns_algebra`.
+Because of these patterns, I will create a dictionary to classify
+identify if an item requires `Modeling`, `apply_division`, or
+`patterns_algebra`.
 
-### Word Cloud
+### Word Cloud: All Questions
 
 ```{r}
 #dfm_item
-textplot_wordcloud(df_Math_toks2)
+
 
 smaller_dfm <-dfm_trim(df_Math_toks2, min_termfreq = 10)
-smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.05, docfreq_type = "prop")
+smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.02, docfreq_type = "prop")
 
-
+textplot_wordcloud(smaller_dfm)
 
 ```
 
@@ -664,9 +689,9 @@ textplot_network(df_Math_toks_smaller, vertex_size = size/ max(size) * 3)
 ## Dictionary: Key Math Terms:
 
 ```{r}
-my_math_dict <- dictionary(list(modeling=c("real-world","context"),             
-              patterns_alg=c("equivalent expression", "eqivalent", "distributive", "distribute", "factor"),
-              apply_division=c("divide","division","quotient")))
+my_math_dict <- dictionary(list(modeling=c("real-world","context", "word_problem"),             
+              patterns_alg=c("equivalent expression", "eqivalent", "distributive", "identify equivalent", "distribute", "factor", "parentheses"),
+              apply_division=c("divide","division","quotient", "quotients")))
 
 my_math_dict
 
@@ -674,12 +699,12 @@ my_math_dict
 ```
 
 ```{r}
-math_Toks2_mydict <- df_Math_toks2 %>%
+math_Toks1_mydict <- df_Math_toks1 %>%
   dfm_lookup(my_math_dict)
 
-tail(math_Toks2_mydict, 10)
+tail(math_Toks1_mydict, 10)
 
-df_MathDict <- convert(math_Toks2_mydict, to = "data.frame")
+df_MathDict <- convert(math_Toks1_mydict, to = "data.frame")
 
 
 
@@ -690,14 +715,15 @@ df_MathDict
 ```
 
 ```{r}
-mathToksDfm_mydict <- df_Math_worst_tokens %>%
+mathToksDFM_mydict <- df_Math_worst_tokens %>%
   dfm_lookup(my_math_dict)
 
-tail(mathToksDfm_mydict, 10)
+tail(mathToksDFM_mydict, 10)
 
-summary(df_Math_toks2)
+summary(df_Math_toks1)
 
 ```
+
 ```{r}
 Math_DF<-mutate(Math_DF, ID = as.character(row_number()))
 
@@ -707,12 +733,13 @@ Math_DF<-left_join(df_MathDict, Math_DF, by = "doc_id")
 
 ```
 
-
 ```{r}
 Math_DF
 
 ```
+
 ## Modeling Visualization
+
 ```{r}
 Math_DF%>%
   filter(modeling > 0)%>%
@@ -791,15 +818,15 @@ Math_DF%>%
 
 
 ```
+
 ```{r}
 Math_DF%>%
   filter(grade_level ==5)%>%
-  filter(`reporting category` == "GE")%>%
-  filter(modeling > 0)
+  filter(`reporting category` == "NT")%>%
+  filter(modeling == 0)
 
 
 ```
-
 
 ## G6 Patterns_Alg and Apply_Div
 
@@ -839,7 +866,6 @@ Math_DF%>%
 
 ```
 
-
 ## G10 Patterns_Alg and Modeling
 
 ```{r}
@@ -877,7 +903,6 @@ Math_DF%>%
 
 
 ```
-
 
 # Science, Technology, and Engineering Exam (STE) Exam
 

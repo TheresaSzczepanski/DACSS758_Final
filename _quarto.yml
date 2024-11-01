@@ -7,8 +7,8 @@ website:
     left:
       - href: CheckIn1.qmd
         text: Check In 1
-      - href: CheckIn2.qmd
-        text: Check In 2
+      - href: CheckIn3.qmd
+        text: Check In 3
  
 
 format:
