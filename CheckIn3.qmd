@@ -522,32 +522,32 @@ df_Math_toks_smaller
 ### n-grams
 
 ```{r}
-# Sys.unsetenv("GITHUB_PAT")
-# devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
+ Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
 #   
-# library(phrasemachine) 
+library(phrasemachine) 
 
 
 ```
 
 ```{r}
 
-# documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[26:29]
-# 
-# #documents_weak_items
-# 
-# phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
-#                          maximum_ngram_length = 4,
-#                          return_phrase_vectors = TRUE,
-#                          return_tag_sequences = TRUE)
-# 
-# # look at some example phrases
-# print(phrases[[1]]$phrases[1:20])
+documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[26:29]
 
-```
-
-```{r}
 #documents_weak_items
+
+phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
+                         maximum_ngram_length = 4,
+                         return_phrase_vectors = TRUE,
+                         return_tag_sequences = TRUE)
+
+# look at some example phrases
+print(phrases[[1]]$phrases[1:20])
+
+```
+
+```{r}
+documents_weak_items
 
 ```
 
