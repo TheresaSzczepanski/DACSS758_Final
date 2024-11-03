@@ -119,20 +119,26 @@ Science exams as well.
 # Load Libraries
 
 ```{r}
+library(caret)
 library(devtools)
 library(ggplot2)
+library(ggpubr)
+library(hrbrthemes)
+library(plotly)
 library(plyr)
+library(purrr)
 library(quanteda)
 library(quanteda.textstats)
 library("quanteda.textplots")
+library(randomForest)
 library(RColorBrewer)
 library(tidytext)
 library(tidyverse)
-library(hrbrthemes)
+library(tree)
 library(viridis)
-library(ggpubr)
-library(purrr)
-library(plotly)
+
+
+
 ```
 
 # Read-in/Tidy Data
@@ -218,9 +224,6 @@ ELA_DF
 ## Math Data Frames
 
 ```{r}
-
-
-
 Math_G5_DF<-read_csv("G5_Math_all_years_2024.csv")%>%
   select(`item description`, year, number, type, `reporting category`, `standard`, `Standard Description`,  `pts`, `school%`, `state%`, school_state_diff, item_library_URL)%>%
   mutate(number = as.factor(number))%>%
@@ -331,17 +334,17 @@ For each exam I followed a similar approach:
         figurative language
 
     Science:
-    
-    -   `analyze graph`: Students are asked questions involving the analysis
-    of a graph
-    
-    -   `analyze model`: Students are asked questions involving the analysis
-    of a model
 
+    -   `analyze graph`: Students are asked questions involving the
+        analysis of a graph
+
+    -   `analyze model`: Students are asked questions involving the
+        analysis of a model
 
 7.  Update the `Subject_DF` to include the new features identified via
     the subject area dictionary for each of the documents to use as a
-    feature for Supervised Machine Learning model that will predict `school_state_diff`.
+    feature for Supervised Machine Learning model that will predict
+    `school_state_diff`.
 
 # Math Exam
 
@@ -372,7 +375,8 @@ text, the stop words play more significant roles?
 Given, these results, I will pre-process the data two ways, once using
 the lowest recommended score, **N,** but also going lowercase as I can't
 see how this has an effect on anything and has a correlation coefficient
-of 0, and once using methods that includes removing stop words to use for text visualization and simple descriptive summaries of the text:
+of 0, and once using methods that includes removing stop words to use
+for text visualization and simple descriptive summaries of the text:
 
 -   Recommended preText score: "N-L" (remove punctuation and lowercase)
 
@@ -425,7 +429,6 @@ of 0, and once using methods that includes removing stop words to use for text v
 ```
 
 ### Tokenization 1: N-L
-
 
 ```{r}
 ## Extract the tokens
@@ -519,35 +522,36 @@ df_Math_toks_smaller
 ### n-grams
 
 ```{r}
-Sys.unsetenv("GITHUB_PAT")
-devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
-  
-library(phrasemachine) 
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("slanglab/phrasemachine/R/phrasemachine")
+#   
+# library(phrasemachine) 
 
 
 ```
 
 ```{r}
 
-documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[26:29]
+# documents_weak_items<-as.character(corpus_subset(Math_item_corpus, school_state_diff < -2))[26:29]
+# 
+# #documents_weak_items
+# 
+# phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
+#                          maximum_ngram_length = 4,
+#                          return_phrase_vectors = TRUE,
+#                          return_tag_sequences = TRUE)
+# 
+# # look at some example phrases
+# print(phrases[[1]]$phrases[1:20])
 
+```
+
+```{r}
 #documents_weak_items
 
-phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
-                         maximum_ngram_length = 4,
-                         return_phrase_vectors = TRUE,
-                         return_tag_sequences = TRUE)
-
-# look at some example phrases
-print(phrases[[1]]$phrases[1:20])
-
 ```
 
-```{r}
-documents_weak_items
-
-```
-## Worst performing Items
+## Subset: Worst performing Items
 
 ```{r}
 Math_worst_item_corpus<- corpus_subset(Math_item_corpus, school_state_diff < 2 )
@@ -561,8 +565,8 @@ Math_worst_tokens <- tokens_tolower(Math_worst_tokens)
 
 
 Math_worst_tokens <-  tokens_select(Math_worst_tokens,
-                   pattern = stopwords("en"),
-                  selection = "remove")
+                  pattern = stopwords("en"),
+                 selection = "remove")
 
 lem_Math_worst_tokens<-tokens_replace(Math_worst_tokens,
                              pattern = lexicon:: hash_lemmas$token,
@@ -573,7 +577,7 @@ df_Math_worst_toks_smaller<- dfm_trim(df_Math_worst_tokens, min_docfreq = 0.08, 
 
 ```
 
-## Best performing Items
+## Subset: Best performing Items
 
 ```{r}
 Math_best_item_corpus<- corpus_subset(Math_item_corpus, school_state_diff > 5 )
@@ -587,8 +591,8 @@ Math_best_tokens <- tokens_tolower(Math_best_tokens)
 
 
 Math_best_tokens <-  tokens_select(Math_best_tokens,
-                   pattern = stopwords("en"),
-                  selection = "remove")
+                  pattern = stopwords("en"),
+                 selection = "remove")
 
 lem_Math_best_tokens<-tokens_replace(Math_best_tokens,
                              pattern = lexicon:: hash_lemmas$token,
@@ -601,16 +605,36 @@ df_Math_best_toks_smaller<- dfm_trim(df_Math_best_tokens, min_docfreq = 0.08, do
 
 ## Descriptive Analysis
 
-Interestingly, some words like "determine", "real-world", and "expression" are top features from the Math tokens as a whole ***but***, in the tokens taken only from the worst performing items, the word expression appears ***much*** more frequently than the phrase "real-world", and this is the opposite in our best performing items and the entire corpus. Also, the word graph is a top-feature in the Math corpus and the best performing items but not a top-feature in the worst performing items.
+Interestingly, some words like "determine", "real-world", and
+"expression" are top features from the Math tokens as a whole ***but***,
+in the tokens taken only from the worst performing items, the word
+expression appears ***much*** more frequently than the phrase
+"real-world", and this is the opposite in our best performing items and
+the entire corpus. Also, the word "graph" is a top-feature in the Math
+corpus and the best performing items but not a top-feature in the worst
+performing items.
+
+## All Items: Top Features
 
 ```{r}
 topfeatures(df_Math_toks2, 20)
 
 #topfeatures(df_Math_toks1, 20)
 
+```
+
+## Worstperforming Items: Top Features
+
+```{r}
+
 topfeatures(df_Math_worst_toks_smaller, 20)
 
 
+```
+
+## Best performing Items: Top Features
+
+```{r}
 topfeatures(df_Math_best_toks_smaller, 20)
 ```
 
@@ -620,10 +644,9 @@ I found it particularly interesting when I saw the connections on the
 worst performing subset vs. the best performing subset. There appears to
 be a theme of identifying equivalent expressions that only appears in
 the worst subset. Solving "real-world" problems; i.e. Modeling, appears
-strongly in both our best and worst subset. This makes me curious if
-there are certain mathematical topics where our students are struggling
-with the modeling problems. I will hopefully be able to explore this
-with topic modeling in the future.
+strongly in ***both*** our best and worst subset. This makes me curious
+if there are certain mathematical topics where our students are
+struggling with the modeling problems.
 
 Because of these patterns, I will create a dictionary to classify
 identify if an item requires `Modeling`, `apply_division`, or
@@ -633,8 +656,6 @@ identify if an item requires `Modeling`, `apply_division`, or
 
 ```{r}
 #dfm_item
-
-
 smaller_dfm <-dfm_trim(df_Math_toks2, min_termfreq = 10)
 smaller_dfm <- dfm_trim(smaller_dfm, min_docfreq = 0.02, docfreq_type = "prop")
 
@@ -642,7 +663,39 @@ textplot_wordcloud(smaller_dfm)
 
 ```
 
-### Worst-performing questions
+### All questions
+
+Clearly, mathematical modeling is a significant skill throughout the
+Math exam as the network "solve real-world problem" and the connection
+"real-world context" are very strong.
+
+The word "expression"
+
+```{r}
+### Word connections for all items
+
+dim(df_Math_toks_smaller)
+
+# compute size weight for vertices in network
+size <- log(colSums(df_Math_toks_smaller))
+
+# create plot
+textplot_network(df_Math_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+### Worst-performing questions Network Plot
+
+The connection "equivalent expression" and the connections to the word
+"expression" are ***much stronger*** in the network of students' weakest
+performing items. Noticeable, the words "context" and "represent" are
+not present as strong connectors to the word "expression" however they
+are in the best items network. This signals to me that that the
+algebraic manipulation of expressions is a weakness rather than
+constructing an expression in a mathematical modeling context.
+
+The network "solve real-world problem" is also strong in our weakest
+performing item descriptions but not as heavily emphasized as in our
+strongest performing items.
 
 ```{r}
 ### Word connections for worst items
@@ -658,6 +711,14 @@ textplot_network(df_Math_worst_toks_smaller, vertex_size = size/ max(size) * 3)
 
 ### Best-performing questions
 
+We can see the clear thread of "solve real-world problems" is strongly
+present in our students' best performing items' descriptions.
+
+Also, I can see the connection "determine expression" present as well as
+"represent" and "context". These strike me as words connected with
+constructing models and identifying mathematical concepts in word
+problems.
+
 ```{r}
 ### Word connections for best items
 
@@ -670,27 +731,13 @@ size <- log(colSums(df_Math_best_toks_smaller))
 textplot_network(df_Math_best_toks_smaller, vertex_size = size/ max(size) * 3)
 ```
 
-### All questions
-
-```{r}
-### Word connections for all items
-
-dim(df_Math_toks_smaller)
-
-# compute size weight for vertices in network
-size <- log(colSums(df_Math_toks_smaller))
-
-# create plot
-textplot_network(df_Math_toks_smaller, vertex_size = size/ max(size) * 3)
-```
-
 ## Dictionary to Create New Features
 
 ## Dictionary: Key Math Terms:
 
 ```{r}
 my_math_dict <- dictionary(list(modeling=c("real-world","context", "word_problem"),             
-              patterns_alg=c("equivalent expression", "eqivalent", "distributive", "identify equivalent", "distribute", "factor", "parentheses"),
+              patterns_alg=c("equivalent expression", "distributive", "identify equivalent", "distribute", "factor", "parentheses"),
               apply_division=c("divide","division","quotient", "quotients")))
 
 my_math_dict
@@ -715,12 +762,12 @@ df_MathDict
 ```
 
 ```{r}
-mathToksDFM_mydict <- df_Math_worst_tokens %>%
-  dfm_lookup(my_math_dict)
-
-tail(mathToksDFM_mydict, 10)
-
-summary(df_Math_toks1)
+# mathToksDFM_mydict <- df_Math_worst_tokens %>%
+#   dfm_lookup(my_math_dict)
+# 
+# head(mathToksDFM_mydict, 10)
+# 
+# summary(df_Math_toks1)
 
 ```
 
@@ -734,17 +781,51 @@ Math_DF<-left_join(df_MathDict, Math_DF, by = "doc_id")
 ```
 
 ```{r}
-Math_DF
+Math_DF<-Math_DF%>%
+  mutate(modeling_factor = case_when(
+    modeling == 0 ~ "no",
+    modeling > 0 ~ "yes"
+  ))%>%
+  mutate(patterns_alg_factor = case_when(
+    patterns_alg == 0 ~ "no",
+    patterns_alg > 0 ~ "yes"
+  ))%>%
+  mutate(apply_division_factor = case_when(
+    apply_division == 0 ~ "no",
+    apply_division > 0 ~ "yes"
+  ))
+
+  
 
 ```
 
 ## Modeling Visualization
 
 ```{r}
+
 Math_DF%>%
-  filter(modeling > 0)%>%
+  #filter(modeling > 0)%>%
   filter(grade_level == 10)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math MCAS: Student Performance Modeling by Reporting Category")
+
+
+```
+
+```{r}
+
+Math_DF%>%
+  #filter(modeling > 0)%>%
+  filter(grade_level == 10)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -755,11 +836,15 @@ Math_DF%>%
     ) +
     ggtitle("Math G10 MCAS: Student Performance Modeling by Reporting Category")
 
+```
+
+### G5 Modeling
+```{r}
 
 Math_DF%>%
-  filter(modeling > 0)%>%
+  #filter(modeling > 0)%>%
   filter(grade_level == 5)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -771,9 +856,20 @@ Math_DF%>%
     ggtitle("Math G5 MCAS: Student Performance Modeling by Reporting Category")
 
 Math_DF%>%
-  filter(modeling == 0)%>%
   filter(grade_level == 5)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+  filter(modeling_factor == "yes")%>%
+  filter(`reporting category` == "GE")
+  
+
+```
+
+### G6 Modeling
+```{r}
+
+Math_DF%>%
+  #filter(modeling > 0)%>%
+  filter(grade_level == 6)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -782,13 +878,41 @@ Math_DF%>%
       #legend.position="none",
       plot.title = element_text(size=11)
     ) +
-    ggtitle("Math G5 MCAS: Student Performance Modeling by Reporting Category")
+    ggtitle("Math G6 MCAS: Student Performance Modeling by Reporting Category")
+
+#Math_DF
+Math_DF%>%
+  filter(grade_level == 6)%>%
+  filter(modeling_factor == "yes")%>%
+  filter(`reporting category` == "RP")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
 
 
 Math_DF%>%
-  filter(modeling > 0)%>%
+  filter(grade_level == 6)%>%
+  filter(modeling_factor == "yes")%>%
+  filter(`reporting category` == "GE")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
+
+
+# Math_DF%>%
+#   filter(grade_level == 6)%>%
+#   filter(modeling_factor == "yes")%>%
+#   filter(`reporting category` == "SP")%>%
+#   select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+#   arrange(`school_state_diff`)
+#   
+
+```
+### G7 Modeling
+```{r}
+
+Math_DF%>%
+  #filter(modeling > 0)%>%
   filter(grade_level == 7)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -799,44 +923,76 @@ Math_DF%>%
     ) +
     ggtitle("Math G7 MCAS: Student Performance Modeling by Reporting Category")
 
+Math_DF
 Math_DF%>%
-  filter(modeling == 0)%>%
   filter(grade_level == 7)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`reporting category`)) +
-    geom_boxplot() +
-    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9) +
-    theme_ipsum() +
-    theme(
-      #legend.position="none",
-      plot.title = element_text(size=11)
-    ) +
-    ggtitle("Math G7 MCAS: Student Performance Modeling by Reporting Category")
-
-
-
+  filter(modeling_factor == "yes")%>%
+  filter(`reporting category` == "EE")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
 
 
 ```
+### G8 Modeling
+```{r}
+
+Math_DF%>%
+  #filter(modeling > 0)%>%
+  filter(grade_level == 8)%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling_factor`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G8 MCAS: Student Performance Modeling by Reporting Category")
+
+
+Math_DF%>%
+  filter(grade_level == 8)%>%
+  filter(modeling_factor == "no")%>%
+  filter(`reporting category` == "SP")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
+
+
+```
+
+
+## Patterns_Alg Visual
+
+The concept of equivalent expressions, the distributive property, and factoring seems to be emphasized and particularly challenging for our students in grades 6, 7, and 10. It is not heavily emphasized on the G8 exam.
 
 ```{r}
 Math_DF%>%
-  filter(grade_level ==5)%>%
-  filter(`reporting category` == "NT")%>%
-  filter(modeling == 0)
+  #filter(patterns_alg > 0)%>%
+  filter(grade_level == 6 | grade_level == 7 | grade_level == 10)%>%
+  ggplot( aes(x=`patterns_alg_factor`, y=`school_state_diff`, fill=`patterns_alg_factor`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G6, G7, G10 MCAS: Student Performance Patterns Algebra")#+
+ #facet_wrap(~`reporting category`)
 
 
 ```
 
-## G6 Patterns_Alg and Apply_Div
+### G6
 
 ```{r}
 
 Math_DF%>%
   #filter(patterns_alg > 0)%>%
-  mutate(patterns_alg = as.factor(patterns_alg))%>%
   filter(grade_level == 6)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`patterns_alg`)) +
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`patterns_alg_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -849,10 +1005,45 @@ Math_DF%>%
 
 
 Math_DF%>%
-  #filter(patterns_alg > 0)%>%
-  mutate(apply_division = as.factor(apply_division))%>%
   filter(grade_level == 6)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`apply_division`)) +
+  filter(patterns_alg_factor == "yes")%>%
+ # filter(`reporting category` == "SP")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
+
+
+
+```
+
+## Apply Division Visual
+### G6
+
+G6 is the when students are expected to be fluent in the standard algorithm for long division. Applying division seems to have been a factor in student success in some G6 reporting categories
+
+```{r}
+Math_DF%>%
+  #filter(patterns_alg > 0)%>%
+  filter(grade_level == 6)%>%
+  ggplot( aes(x=`apply_division_factor`, y=`school_state_diff`, fill=`apply_division_factor`)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      #legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Math G6 MCAS: Student Performance Apply Division")#+
+ #facet_wrap(~`grade_level`)
+
+
+```
+
+```{r}
+Math_DF%>%
+  filter(grade_level == 6)%>%
+  filter(`reporting category` == "NS" | `reporting category` == "EE")%>%
+  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`apply_division_factor`)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
@@ -864,45 +1055,150 @@ Math_DF%>%
     ggtitle("Math G6 MCAS: Student Performance Apply_Division and Reporting Category")
 
 
+
+
+Math_DF%>%
+  filter(grade_level == 6)%>%
+  filter(apply_division_factor == "yes")%>%
+  filter(patterns_alg_factor == "no")%>%
+ # filter(`reporting category` == "SP")%>%
+  select(`standard`, `item description`, `school_state_diff`, `year`, item_library_URL)%>%
+  arrange(`school_state_diff`)
+
+
+
 ```
 
-## G10 Patterns_Alg and Modeling
+## Machine Learning Model to Predict school_state_diff
+
+### Create Training Set
+
+
+***To Do: Cross-validation***
+
+```{r}
+#Math_DF
+Math_DF_Train_Full<-Math_DF%>%
+  select(`doc_id`, `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`, `school_state_diff`)
+
+Math_DF_Train_Full
+
+```
+### Create Training Set
+```{r}
+# set seed
+set.seed(12345)
+
+N<-nrow(Math_DF_Train_Full)
+
+trainIndex <- sample(1:N, .8*N)
+
+testIndex<-c(1:N)[-trainIndex]
+
+# check length of training set
+length(trainIndex)
+
+trainIndexDF<-trainIndex
+
+#Math_DF_Test<-Math_DF_Train_Full[-Math_DF_Train]
+
+
+trainIndexDF<-as.data.frame(t(trainIndex))
+dim(trainIndexDF)
+#dim(Math_DF_Test)
+
+#Create training vector
+
+#trainIndexDF
+
+trainIndexDF<-trainIndexDF%>%
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "ID")
+trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
+  select("doc_id")
+
+#Math_DF_Train_Full
+
+Math_DF_Train<-left_join(trainIndexDF, Math_DF_Train_Full, by = "doc_id")
+
+Math_DF_Train_X<-Math_DF_Train%>%
+  select( `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`)
+
+Math_DF_Train_Y<-Math_DF_Train%>%
+  select(`school_state_diff`)
+
+Math_DF_Train_Y
+
+
+```
+### Create Test Set
+
+```{r}
+testIndexDF<-testIndex
+
+#Math_DF_Test<-Math_DF_Test_Full[-Math_DF_Test]
+
+
+testIndexDF<-as.data.frame(t(testIndex))
+dim(testIndexDF)
+#dim(Math_DF_Test)
+
+#Create testing vector
+
+#testIndexDF
+
+testIndexDF<-testIndexDF%>%
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "ID")
+testIndexDF<-mutate(testIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
+  select("doc_id")
+
+#Math_DF_Test_Full
+
+Math_DF_Test<-left_join(testIndexDF, Math_DF_Train_Full, by = "doc_id")
+
+Math_DF_Test_X<-Math_DF_Test%>%
+  select( `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`)
+
+Math_DF_Test_Y<-Math_DF_Test%>%
+  select(`school_state_diff`)
+
+
+Math_DF_Test_Y
+Math_DF_Train_Y
+
+Math_DF_Train_X
+
+Math_DF_Test_X
+
+```
+### Random Forest Model
+
+```{r}
+set.seed(444)
+
+diff_RF<-randomForest(Math_DF_Train_X,
+                      y = Math_DF_Train$school_state_diff,
+                      xtest = Math_DF_Test_X,
+                      ytest = Math_DF_Test$school_state_diff,
+                      importance = TRUE,
+                      ntree = 10000,
+                      type="regression")
+
+
+```
 
 ```{r}
 
-Math_DF%>%
-  #filter(patterns_alg > 0)%>%
-  mutate(patterns_alg = as.factor(patterns_alg))%>%
-  filter(grade_level == 10)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`patterns_alg`)) +
-    geom_boxplot() +
-    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9) +
-    theme_ipsum() +
-    theme(
-      #legend.position="none",
-      plot.title = element_text(size=11)
-    ) +
-    ggtitle("Math G10 MCAS: Student Performance Patterns Algebra and Reporting Category")
+diff_RF
 
+```
 
-Math_DF%>%
-  #filter(patterns_alg > 0)%>%
-  mutate(modeling = as.factor(modeling))%>%
-  filter(grade_level == 10)%>%
-  ggplot( aes(x=`reporting category`, y=`school_state_diff`, fill=`modeling`)) +
-    geom_boxplot() +
-    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9) +
-    theme_ipsum() +
-    theme(
-      #legend.position="none",
-      plot.title = element_text(size=11)
-    ) +
-    ggtitle("Math G10 MCAS: Student Performance Modeling and Reporting Category")
+```{r}
+varImpPlot(diff_RF)
 
 
 ```
+
+
 
 # Science, Technology, and Engineering Exam (STE) Exam
 
@@ -1308,7 +1604,6 @@ df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
 
 df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .06, docfreq_type = "prop")
 
-## to do make this smaller
 
 
 
@@ -1345,7 +1640,6 @@ df_STE_best_toks<-dfm(lem_STE_best_tokens)
 
 df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .06, docfreq_type = "prop")
 
-## to do make this smaller
 
 
 
@@ -1880,21 +2174,15 @@ textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 
 At this phase, you might have more questions than answers. Document all
 those questions.
 
-1.  Do you think that the sizes of the text corpa I have are now large
-    enough?
 
-2.  Do you have thoughts on the inclusion/exclusion of stop words. I
-    went against what pretext recommended and found removing stopwords
-    to still be helpful for the Science and Math descriptions. Is that
-    ok?
+1. I fit a random forest model that included features extracted from my dictionaries to predict `school_state_diff`. My plan is to also fit a random forest model that does not include my dictionary extracted features to see if there is a difference in the RMSE. Are there other things I should be looking at to evaluate the fit of these models?
 
-I'm just leaving these prior questions here for me as a reference
 
-1.  The Urrutia and Araya article discussed creating linguistic features
-    using **dep/NumMod** tokens and **tag/Num** tokens. I was wondering
-    if there is a good place for me to read about and understand them as
-    a concept?
+2. Should I also try other models like an SVM that includes and an SVM that does not include my dictionary based features?
 
-2.  The Varinhos article discusses the use of topic modeling. This is
-    something I would be interested in applying. Is there a good place
-    to read about the fundamentals of topic modeling?
+3. I would like to do cross-validation and take the average of my RMSE to get a better sense of how the model is performing. Will we have any samples of this in R-tutorials? I have done it in python but not in R.
+
+
+4. Once I work out these details with the fitting and evaluating the models, I would like to follow the same process of creating dictionaries, extracting new features, and then fitting and evaluating predictive models for the Science and ELA exams. Is there anything else you think I should be incorporating in my process?
+
+
