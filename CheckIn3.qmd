@@ -3,6 +3,10 @@ title: "Check in 3"
 pagetitle: CheckIn3.qmd
 author: "Theresa Szczepanski"
 format:
+  # pdf:
+  #   toc: true
+  #   number-sections: true
+  #   colorlinks: true
   html:
     embed-resoures: true
     self-contained-math: true
@@ -1079,7 +1083,15 @@ Math_DF%>%
 ```{r}
 #Math_DF
 Math_DF_Train_Full<-Math_DF%>%
-  select(`doc_id`, `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`, `school_state_diff`)
+  mutate(year = as.factor(year))%>%
+  mutate(`school_state_bool` = case_when(
+    `school_state_diff` <= 0 ~ "negative",
+    `school_state_diff` > 0 ~ "positive")
+  )%>%
+  #filter(grade_level == 5)%>%
+  filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
+ mutate(id = row_number())%>%
+  select(`doc_id`, `id`, `standard`, `reporting category`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`, `school_state_bool`, `school_state_diff`, `grade_level`)
 
 Math_DF_Train_Full
 
@@ -1109,22 +1121,26 @@ dim(trainIndexDF)
 
 #Create training vector
 
-#trainIndexDF
+trainIndexDF
 
 trainIndexDF<-trainIndexDF%>%
-  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "ID")
-trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
-  select("doc_id")
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
+#trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, #sep="")))%>%
+#  select("doc_id")
 
-#Math_DF_Train_Full
+trainIndexDF
 
-Math_DF_Train<-left_join(trainIndexDF, Math_DF_Train_Full, by = "doc_id")
+Math_DF_Train_Full
+
+Math_DF_Train<-left_join(trainIndexDF, Math_DF_Train_Full, by = "id")
+
+Math_DF_Train
 
 Math_DF_Train_X<-Math_DF_Train%>%
-  select( `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`)
+  select( `standard`, `reporting category`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`, grade_level)
 
 Math_DF_Train_Y<-Math_DF_Train%>%
-  select(`school_state_diff`)
+  select(`school_state_bool`)
 
 Math_DF_Train_Y
 
@@ -1147,19 +1163,19 @@ dim(testIndexDF)
 #testIndexDF
 
 testIndexDF<-testIndexDF%>%
-  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "ID")
-testIndexDF<-mutate(testIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
-  select("doc_id")
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
+#testIndexDF<-mutate(testIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
+#  select("doc_id")
 
 #Math_DF_Test_Full
 
-Math_DF_Test<-left_join(testIndexDF, Math_DF_Train_Full, by = "doc_id")
+Math_DF_Test<-left_join(testIndexDF, Math_DF_Train_Full, by = "id")
 
 Math_DF_Test_X<-Math_DF_Test%>%
-  select( `standard`, `reporting category`, `grade_level`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`)
+  select( `standard`, `reporting category`, `type`, `year`,  `modeling_factor`, `patterns_alg_factor`, `apply_division_factor`, grade_level)
 
 Math_DF_Test_Y<-Math_DF_Test%>%
-  select(`school_state_diff`)
+  select(`school_state_bool`)
 
 
 Math_DF_Test_Y
@@ -1172,6 +1188,43 @@ Math_DF_Test_X
 ```
 ### Random Forest Model
 
+#### Classification
+
+
+```{r}
+set.seed(444)
+
+bool_RF<-randomForest(Math_DF_Train_X,
+                      y = as.factor(Math_DF_Train$school_state_bool),
+                      xtest = Math_DF_Test_X,
+                      ytest = as.factor(Math_DF_Test$school_state_bool),
+                      mtry = 2,
+                      importance = TRUE,
+                      ntree = 10000)
+
+
+```
+
+```{r}
+# confusion matrix
+actual <- as.factor(Math_DF_Test$school_state_bool)
+predicted <- bool_RF$test[['predicted']]
+confusion <- table(predicted,actual)
+confusionMatrix(confusion, mode="everything")
+
+
+```
+
+```{r}
+
+varImpPlot(bool_RF)
+
+
+```
+
+#### Regression
+
+
 ```{r}
 set.seed(444)
 
@@ -1179,10 +1232,10 @@ diff_RF<-randomForest(Math_DF_Train_X,
                       y = Math_DF_Train$school_state_diff,
                       xtest = Math_DF_Test_X,
                       ytest = Math_DF_Test$school_state_diff,
+                      mtry = 1,
                       importance = TRUE,
-                      ntree = 10000,
+                      ntree = 1000,
                       type="regression")
-
 
 ```
 
@@ -2166,6 +2219,147 @@ size <- log(colSums(df_ELA_worst_inf_toks_smaller))
 
 # create plot
 textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 3)
+```
+
+## Machine Learning
+
+```{r}
+ELA_DF
+ELA_DF_Train_Full<-ELA_DF%>%
+   mutate(year = as.factor(year))%>%
+#   mutate(`school_state_bool` = case_when(
+#     `school_state_diff` <= 0 ~ "negative",
+#     `school_state_diff` > 0 ~ "positive")
+#   )%>%
+  filter(grade_level == 10)%>%
+#   filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
+  mutate(id = row_number())%>%
+   select(`id`, `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `school_state_diff`, `grade_level`)
+# 
+ ELA_DF_Train_Full
+
+```
+### Create Training Set
+```{r}
+# set seed
+set.seed(12345)
+
+N<-nrow(ELA_DF_Train_Full)
+
+trainIndex <- sample(1:N, .8*N)
+
+testIndex<-c(1:N)[-trainIndex]
+
+# check length of training set
+length(trainIndex)
+
+trainIndexDF<-trainIndex
+
+#Math_DF_Test<-Math_DF_Train_Full[-Math_DF_Train]
+
+
+trainIndexDF<-as.data.frame(t(trainIndex))
+dim(trainIndexDF)
+#dim(Math_DF_Test)
+
+#Create training vector
+
+trainIndexDF
+
+trainIndexDF<-trainIndexDF%>%
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
+#trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, #sep="")))%>%
+#  select("doc_id")
+
+trainIndexDF
+
+ELA_DF_Train_Full
+
+ELA_DF_Train<-left_join(trainIndexDF, ELA_DF_Train_Full, by = "id")
+
+ELA_DF_Train
+
+ELA_DF_Train_X<-ELA_DF_Train%>%
+  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `grade_level`)
+
+ELA_DF_Train_Y<-ELA_DF_Train%>%
+  select(`school_state_diff`)
+
+ELA_DF_Train_Y
+
+
+```
+### Create Test Set
+
+```{r}
+testIndexDF<-testIndex
+
+#ELA_DF_Test<-ELA_DF_Test_Full[-ELA_DF_Test]
+
+
+testIndexDF<-as.data.frame(t(testIndex))
+dim(testIndexDF)
+#dim(ELA_DF_Test)
+
+#Create testing vector
+
+#testIndexDF
+
+testIndexDF<-testIndexDF%>%
+  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
+#testIndexDF<-mutate(testIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
+#  select("doc_id")
+
+#ELA_DF_Test_Full
+
+ELA_DF_Test<-left_join(testIndexDF, ELA_DF_Train_Full, by = "id")
+
+ELA_DF_Test_X<-ELA_DF_Test%>%
+select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `grade_level`)
+
+
+ELA_DF_Test_Y<-ELA_DF_Test%>%
+  select(`school_state_diff`)
+
+
+ELA_DF_Test_Y
+ELA_DF_Train_Y
+
+ELA_DF_Train_X
+
+ELA_DF_Test_X
+
+```
+
+### Random Forest Model
+
+## Regression
+
+
+```{r}
+set.seed(444)
+
+ELA_diff_RF<-randomForest(ELA_DF_Train_X,
+                      y = ELA_DF_Train$school_state_diff,
+                      xtest = ELA_DF_Test_X,
+                      ytest = ELA_DF_Test$school_state_diff,
+                      mtry = 1,
+                      importance = TRUE,
+                      type="regression",
+                      ntree = 10000)
+
+
+```
+
+```{r}
+ELA_diff_RF
+
+
+```
+```{r}
+
+varImpPlot(ELA_diff_RF)
+
 ```
 
 # Questions
