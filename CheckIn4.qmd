@@ -2087,7 +2087,7 @@ STE_DF_Train<-left_join(trainIndexDF, STE_DF_Train_Full, by = "id")
 STE_DF_Train
 
 STE_DF_Train_X<-STE_DF_Train%>%
-  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`, model_factor, algebra_factor)
+  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `state%`, `grade_level`, model_factor,  type)
 
 STE_DF_Train_Y<-STE_DF_Train%>%
   select(`school_state_diff`)
@@ -2122,7 +2122,7 @@ testIndexDF<-testIndexDF%>%
 STE_DF_Test<-left_join(testIndexDF, STE_DF_Train_Full, by = "id")
 
 STE_DF_Test_X<-STE_DF_Test%>%
-select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`, model_factor, algebra_factor)
+select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`,  `state%`, `grade_level`, model_factor, type)
 
 
 STE_DF_Test_Y<-STE_DF_Test%>%
@@ -2149,7 +2149,7 @@ STE_diff_RF_Text<-randomForest(STE_DF_Train_X,
                       y = STE_DF_Train$school_state_diff,
                       xtest = STE_DF_Test_X,
                       ytest = STE_DF_Test$school_state_diff,
-                      mtry = 4,
+                      mtry = 3,
                       importance = TRUE,
                       type="regression",
                       ntree = 10000)
@@ -2598,7 +2598,65 @@ size <- log(colSums(df_ELA_worst_inf_toks_smaller))
 # create plot
 textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 3)
 ```
+## Dictionary to Create New Features
 
+## Dictionary: Key ELA Terms:
+
+```{r}
+my_ela_dict <- dictionary(list(poetry=c("poem","stanza", "lyric", "verse")))
+
+my_ela_dict
+
+# patterns_alg=c("equivalent expression","radical expression", "rational expression", #"expression", "eqivalent", "distributive", "distribute", "factor")
+```
+
+```{r}
+ELA_Toks1_mydict <- df_ELA_toks1 %>%
+  dfm_lookup(my_ela_dict)
+
+tail(ELA_Toks1_mydict, 10)
+
+df_ELADict <- convert(ELA_Toks1_mydict, to = "data.frame")
+
+
+
+df_ELADict
+
+#Math_DF<-left_join(df_MathDict, Math_DF, by = "doc_id")
+
+```
+
+```{r}
+# mathToksDFM_mydict <- df_Math_worst_tokens %>%
+#   dfm_lookup(my_math_dict)
+# 
+# head(mathToksDFM_mydict, 10)
+# 
+# summary(df_Math_toks1)
+
+```
+
+```{r}
+ELA_DF<-mutate(ELA_DF, ID = as.character(row_number()))
+
+ELA_DF<-mutate(ELA_DF, doc_id = str_trim(paste("text", ID, sep="")))
+
+ELA_DF<-left_join(df_ELADict, ELA_DF, by = "doc_id")
+
+ELA_DF
+
+```
+
+```{r}
+ELA_DF<-ELA_DF%>%
+  mutate(poetry_factor = case_when(
+    poetry == 0 ~ "no",
+    poetry > 0 ~ "yes"
+  ))
+
+  
+
+```
 ## Machine Learning
 
 ```{r}
@@ -2609,10 +2667,10 @@ ELA_DF_Train_Full<-ELA_DF%>%
 #     `school_state_diff` <= 0 ~ "negative",
 #     `school_state_diff` > 0 ~ "positive")
 #   )%>%
-  filter(grade_level == 10)%>%
-#   filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
+  filter(grade_level == 10| grade_level ==8)%>%
+  # filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
   mutate(id = row_number())%>%
-   select(`id`, `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`)
+   select(`id`, `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`, `poetry_factor`)
 # 
  ELA_DF_Train_Full
 
@@ -2659,16 +2717,10 @@ ELA_DF_Train<-left_join(trainIndexDF, ELA_DF_Train_Full, by = "id")
 
 ELA_DF_Train
 
-ELA_DF_Train_X<-ELA_DF_Train%>%
-  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`)
-
-ELA_DF_Train_Y<-ELA_DF_Train%>%
-  select(`school_state_diff`)
-
-ELA_DF_Train_Y
-
-
 ```
+
+
+
 
 ### Create Test Set
 
@@ -2695,6 +2747,27 @@ testIndexDF<-testIndexDF%>%
 
 ELA_DF_Test<-left_join(testIndexDF, ELA_DF_Train_Full, by = "id")
 
+
+
+```
+
+### Random Forest Model
+
+#### Base Regression
+
+```{r}
+
+
+ELA_DF_Train_X<-ELA_DF_Train%>%
+  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`)
+
+ELA_DF_Train_Y<-ELA_DF_Train%>%
+  select(`school_state_diff`)
+
+ELA_DF_Train_Y
+
+
+
 ELA_DF_Test_X<-ELA_DF_Test%>%
 select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`)
 
@@ -2712,44 +2785,40 @@ ELA_DF_Test_X
 
 ```
 
-### Random Forest Model
-
-#### Regression
-
 ```{r}
 set.seed(444)
 
 ELA_diff_RF<-randomForest(ELA_DF_Train_X,
                       y = ELA_DF_Train$school_state_diff,
-                     # xtest = ELA_DF_Test_X,
-                    #  ytest = ELA_DF_Test$school_state_diff,
+                      xtest = ELA_DF_Test_X,
+                      ytest = ELA_DF_Test$school_state_diff,
                       mtry = 1,
                       importance = TRUE,
                       type="regression",
-                      ntree = 10000)
+                      ntree = 1000)
 
 
 ```
 
 ```{r}
 ELA_diff_RF
-predicted<-predict(ELA_diff_RF, ELA_DF_Test_X)
-mae(predicted, ELA_DF_Test$school_state_diff)
+#predicted<-predict(ELA_diff_RF, ELA_DF_Test_X)
+#mae(predicted, ELA_DF_Test$school_state_diff)
 
-actual <- ELA_DF_Test$school_state_diff
-
-
+#actual <- ELA_DF_Test$school_state_diff
 
 
-R2 <- 1 - (sum((actual-predicted)^2)/sum((actual-mean(actual))^2))
 
-R2
 
-mean(abs(actual-predicted))
+#R2 <- 1 - (sum((actual-predicted)^2)/sum((actual-mean(actual))^2))
 
-mean(abs(actual))
-sd(abs(actual))
-sd(abs(actual-predicted))
+#R2
+
+# mean(abs(actual-predicted))
+# 
+# mean(abs(actual))
+# sd(abs(actual))
+# sd(abs(actual-predicted))
 
 ```
 
@@ -2758,6 +2827,83 @@ sd(abs(actual-predicted))
 varImpPlot(ELA_diff_RF)
 
 ```
+
+#### Regression w/text
+
+```{r}
+
+
+ELA_DF_Train_X<-ELA_DF_Train%>%
+  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`, poetry_factor)
+
+ELA_DF_Train_Y<-ELA_DF_Train%>%
+  select(`school_state_diff`)
+
+ELA_DF_Train_Y
+
+
+
+ELA_DF_Test_X<-ELA_DF_Test%>%
+select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`, poetry_factor)
+
+
+ELA_DF_Test_Y<-ELA_DF_Test%>%
+  select(`school_state_diff`)
+
+
+ELA_DF_Test_Y
+ELA_DF_Train_Y
+
+ELA_DF_Train_X
+
+ELA_DF_Test_X
+
+```
+
+```{r}
+set.seed(444)
+
+ELA_diff_RF_text<-randomForest(ELA_DF_Train_X,
+                      y = ELA_DF_Train$school_state_diff,
+                      xtest = ELA_DF_Test_X,
+                      ytest = ELA_DF_Test$school_state_diff,
+                      mtry = 1,
+                      importance = TRUE,
+                      type="regression",
+                      ntree = 1000)
+
+
+```
+
+```{r}
+ELA_diff_RF_text
+#predicted<-predict(ELA_diff_RF, ELA_DF_Test_X)
+#mae(predicted, ELA_DF_Test$school_state_diff)
+
+#actual <- ELA_DF_Test$school_state_diff
+
+
+
+
+#R2 <- 1 - (sum((actual-predicted)^2)/sum((actual-mean(actual))^2))
+
+#R2
+
+# mean(abs(actual-predicted))
+# 
+# mean(abs(actual))
+# sd(abs(actual))
+# sd(abs(actual-predicted))
+
+```
+
+```{r}
+
+varImpPlot(ELA_diff_RF_text)
+
+```
+
+
 
 # Questions
 
