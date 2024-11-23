@@ -284,7 +284,7 @@ Math_DF
 
 ```
 
-# PreProcessing Approach
+# Methods/PreProcessing Approach
 
 For each exam I followed a similar approach:
 
@@ -351,6 +351,12 @@ For each exam I followed a similar approach:
     the subject area dictionary for each of the documents to use as a
     feature for Supervised Machine Learning model that will predict
     `school_state_diff`.
+    
+8. Create a Random Forest model using the features from the MCAS item reports and tune its parameters using 5-fold cross-validation.
+
+9. Create a Random Forest model using the features from the MCAS and ***additional features*** extracted using dictionaries and the document feature matrices.
+
+10. Compare the performance of the models as measured by %variance explained and MAE.
 
 # Math Exam
 
@@ -807,8 +813,6 @@ Math_DF<-Math_DF%>%
 
 ## Modeling Visualization
 
-
-
 ```{r}
 
 Math_DF%>%
@@ -1073,8 +1077,6 @@ Math_DF%>%
 
 ### Create Training Set
 
-
-
 ```{r}
 #Math_DF
 Math_DF_Train_Full<-Math_DF%>%
@@ -1171,9 +1173,10 @@ Math_DF_Test<-left_join(testIndexDF, Math_DF_Train_Full, by = "id")
 
 #### Base Regression
 
-
 ## Cross Validation
-### Randoom forest with text features
+
+### Random forest with text features
+
 ```{r}
 data_ctrl<-trainControl(method = "cv", number = 5)
 
@@ -1183,7 +1186,6 @@ Math_DF_Train_Full_Text<-Math_DF_Train_Full%>%
 Math_DF_Train_Full_Base<-Math_DF_Train_Full%>%
   select(`standard`, `reporting category`, `type`, `year`, `state%`, `grade_level`, `school_state_diff` )
 ```
-
 
 ```{r}
 model_caret_rf_text<-train(school_state_diff ~.
@@ -1200,6 +1202,7 @@ varImpPlot(model_caret_rf_text$finalModel)
 
 
 ```
+
 ```{r}
 model_caret_rf<-train(school_state_diff ~.
                       , data = Math_DF_Train_Full_Base,
@@ -1208,11 +1211,11 @@ model_caret_rf<-train(school_state_diff ~.
 
 ```
 
-
 ```{r}
 model_caret_rf
 
 ```
+
 ```{r}
 
 Math_DF_Train_X<-Math_DF_Train%>%
@@ -1242,7 +1245,6 @@ Math_DF_Test_Y<-Math_DF_Test%>%
 
 
 ```
-
 
 ```{r}
 set.seed(444)
@@ -1306,9 +1308,11 @@ varImpPlot(diff_RF_text)
 
 
 ```
+
 ### Support Vector Regression
 
-***to do*** address the issue that new standards appear in the test set and thus the svm can't make a prediction
+***to do*** address the issue that new standards appear in the test set
+and thus the svm can't make a prediction
 
 ```{r}
 set.seed(446)
@@ -1325,7 +1329,6 @@ svm_text
 #svm_pred<-predict(svm_text, Math_DF_Test_X)
 
 ```
-
 
 # Science, Technology, and Engineering Exam (STE) Exam
 
@@ -1353,11 +1356,10 @@ each individual text is so small and the texts are designed for
 assessing content skills and are not narrative text, the stop words play
 more significant roles?
 
-
-
 Given, these results, I will pre-process the data two ways, once using
-the lowest recommended score, **P-W**  and once using methods that includes, lowercase and lemmatization of words to use for creating visualizations
-
+the lowest recommended score, **P-W** and once using methods that
+includes, lowercase and lemmatization of words to use for creating
+visualizations
 
 -   Recommended preText score: "P-W" (remove punctuation and stopwords)
 
@@ -1461,7 +1463,7 @@ STE_item_tokens2 <- tokens_tolower(STE_item_tokens2)
 
 When I originally made word clouds, I noticed object and objects
 appearing separately as well as model and models. I believe these are
-important, so I chose to also do lemmatization
+important, so I chose to also do lemmatization for creating visual summaries.
 
 ```{r}
 lem_STE_item_tokens2<-tokens_replace(STE_item_tokens2,
@@ -1474,6 +1476,31 @@ lem_STE_item_tokens2
 ```
 
 ## Create DFMs
+
+### n-grams
+
+When I examine the phrases in the first ten documents of weak items, there
+
+```{r}
+library(phrasemachine) 
+documents_weak_items<-as.character(corpus_subset(STE_item_corpus, school_state_diff < -2))[1:10]
+
+#documents_weak_items
+
+phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
+                         maximum_ngram_length = 4,
+                         return_phrase_vectors = TRUE,
+                         return_tag_sequences = TRUE)
+
+# look at some example phrases
+print(phrases[[1]]$phrases[1:20])
+
+```
+
+```{r}
+documents_weak_items
+
+```
 
 ```{r}
 df_STE_toks2<-dfm(lem_STE_item_tokens2)
@@ -1515,7 +1542,7 @@ df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, docfre
 
 ### MS only
 
-#### Worst Items
+#### Subset: Worst Items
 
 ```{r}
 STE_MS_item_corpus<- corpus_subset(STE_item_corpus, grade_level != 9 )
@@ -1550,7 +1577,7 @@ df_STE_MS_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .05, doc
 
 ```
 
-#### Best Items
+#### Subset: Best Items
 
 ```{r}
 
@@ -1765,7 +1792,7 @@ lem_STE_best_tokens<-tokens_replace(STE_best_tokens,
 
 df_STE_best_toks<-dfm(lem_STE_best_tokens)
 
-df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .07, docfreq_type = "prop")
+df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .08, docfreq_type = "prop")
 
 
 
@@ -1862,7 +1889,7 @@ textplot_network(df_STE_MS_best_toks_smaller, vertex_size = size/ max(size) * 3)
 ## Dictionary: Key STE Terms:
 
 ```{r}
-my_ste_dict <- dictionary(list(model=c("graph","interpret graph", "model", "diagram"),             
+my_ste_dict <- dictionary(list(model=c("Analyze force model", "Analyze particle models", "Analyze a graph", "Analyze a diagram", "Interpret a graph", "model", "models", "diagram", "diagram", "graph", "graphs"),             
               algebra=c("calculate")))
 
 my_ste_dict
@@ -1922,177 +1949,10 @@ STE_DF<-STE_DF%>%
 
 ```
 
-## Machine Learning base model
-
+## Machine Learning Training Set
 
 ```{r}
 STE_DF
-STE_DF_Train_Full<-STE_DF%>%
-   mutate(year = as.factor(year))%>%
-#   mutate(`school_state_bool` = case_when(
-#     `school_state_diff` <= 0 ~ "negative",
-#     `school_state_diff` > 0 ~ "positive")
-#   )%>%
-#  filter(grade_level == 10)%>%
-#   filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
-  mutate(id = row_number())%>%
-   select(`id`, `standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `school_state_diff`, `grade_level`)
-# 
- STE_DF_Train_Full
-
-```
-### Create Training Set
-
-```{r}
-# set seed
-set.seed(12345)
-
-N<-nrow(STE_DF_Train_Full)
-
-trainIndex <- sample(1:N, .8*N)
-
-testIndex<-c(1:N)[-trainIndex]
-
-# check length of training set
-length(trainIndex)
-
-trainIndexDF<-trainIndex
-
-#Math_DF_Test<-Math_DF_Train_Full[-Math_DF_Train]
-
-
-trainIndexDF<-as.data.frame(t(trainIndex))
-dim(trainIndexDF)
-#dim(Math_DF_Test)
-
-#Create training vector
-
-trainIndexDF
-
-trainIndexDF<-trainIndexDF%>%
-  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
-#trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, #sep="")))%>%
-#  select("doc_id")
-
-trainIndexDF
-
-STE_DF_Train_Full
-
-STE_DF_Train<-left_join(trainIndexDF, STE_DF_Train_Full, by = "id")
-
-STE_DF_Train
-
-STE_DF_Train_X<-STE_DF_Train%>%
-  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`)
-
-STE_DF_Train_Y<-STE_DF_Train%>%
-  select(`school_state_diff`)
-
-STE_DF_Train_Y
-
-
-```
-### Create Test Set
-
-```{r}
-testIndexDF<-testIndex
-
-#STE_DF_Test<-STE_DF_Test_Full[-STE_DF_Test]
-
-
-testIndexDF<-as.data.frame(t(testIndex))
-dim(testIndexDF)
-#dim(STE_DF_Test)
-
-#Create testing vector
-
-#testIndexDF
-
-testIndexDF<-testIndexDF%>%
-  pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
-#testIndexDF<-mutate(testIndexDF, doc_id = str_trim(paste("text", ID, sep="")))%>%
-#  select("doc_id")
-
-#STE_DF_Test_Full
-
-STE_DF_Test<-left_join(testIndexDF, STE_DF_Train_Full, by = "id")
-
-STE_DF_Test_X<-STE_DF_Test%>%
-select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`)
-
-
-STE_DF_Test_Y<-STE_DF_Test%>%
-  select(`school_state_diff`)
-
-
-STE_DF_Test_Y
-STE_DF_Train_Y
-
-STE_DF_Train_X
-
-STE_DF_Test_X
-
-```
-
-### Random Forest Model
-
-#### Regression
-
-```{r}
-set.seed(444)
-
-STE_diff_RF<-randomForest(STE_DF_Train_X,
-                      y = STE_DF_Train$school_state_diff,
-                      xtest = STE_DF_Test_X,
-                      ytest = STE_DF_Test$school_state_diff,
-                      mtry = 3,
-                      importance = TRUE,
-                      type="regression",
-                      ntree = 10000)
-
-
-STE_diff_RF
-```
-
-```{r}
-STE_diff_RF2<-randomForest(STE_DF_Train_X,
-                      y = STE_DF_Train$school_state_diff,
-                     # xtest = STE_DF_Test_X,
-                      mtry = 3,
-                      importance = TRUE,
-                      type="regression",
-                      ntree = 10000)
-
- predicted<-predict(STE_diff_RF2, STE_DF_Test_X)
- mae(predicted, STE_DF_Test$school_state_diff)
-# 
- actual <- STE_DF_Test$school_state_diff
-# 
-# 
-# 
-# 
- R2 <- 1 - (sum((actual-predicted)^2)/sum((actual-mean(actual))^2))
-# 
- R2
-# 
- mean(abs(actual-predicted))
-# 
-mean(abs(actual))
-sd(abs(actual))
-sd(abs(actual-predicted))
-
-```
-
-```{r}
-
-varImpPlot(STE_diff_RF)
-
-```
-
-## Model w/ text features
-
-```{r}
-#STE_DF
 STE_DF_Train_Full<-STE_DF%>%
    mutate(year = as.factor(year))%>%
 #   mutate(`school_state_bool` = case_when(
@@ -2107,8 +1967,8 @@ STE_DF_Train_Full<-STE_DF%>%
  STE_DF_Train_Full
 
 ```
-### Create Training Set
 
+### Create Training Set
 ```{r}
 # set seed
 set.seed(12345)
@@ -2140,7 +2000,7 @@ trainIndexDF<-trainIndexDF%>%
 #trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, #sep="")))%>%
 #  select("doc_id")
 
-trainIndexDF
+#trainIndexDF
 
 STE_DF_Train_Full
 
@@ -2149,15 +2009,16 @@ STE_DF_Train<-left_join(trainIndexDF, STE_DF_Train_Full, by = "id")
 STE_DF_Train
 
 STE_DF_Train_X<-STE_DF_Train%>%
-  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `state%`, `grade_level`, model_factor,  type)
+  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`, model_factor, algebra_factor)
 
-STE_DF_Train_Y<-STE_DF_Train%>%
-  select(`school_state_diff`)
+STE_DF_Train_Base_X<-STE_DF_Train%>%
+  select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`)
 
-STE_DF_Train_Y
 
+STE_DF_Train_Y<-STE_DF_Train$school_state_diff
 
 ```
+
 ### Create Test Set
 
 ```{r}
@@ -2167,7 +2028,7 @@ testIndexDF<-testIndex
 
 
 testIndexDF<-as.data.frame(t(testIndex))
-dim(testIndexDF)
+#dim(testIndexDF)
 #dim(STE_DF_Test)
 
 #Create testing vector
@@ -2184,7 +2045,10 @@ testIndexDF<-testIndexDF%>%
 STE_DF_Test<-left_join(testIndexDF, STE_DF_Train_Full, by = "id")
 
 STE_DF_Test_X<-STE_DF_Test%>%
-select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`,  `state%`, `grade_level`, model_factor, type)
+select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`, model_factor, algebra_factor)
+
+STE_DF_Test_Base_X<-STE_DF_Test%>%
+select(`standard`, `reporting category`, `discipline core idea`, `pts`, `year`, `type`, `state%`, `grade_level`)
 
 
 STE_DF_Test_Y<-STE_DF_Test%>%
@@ -2197,8 +2061,90 @@ STE_DF_Train_Y
 STE_DF_Train_X
 
 STE_DF_Test_X
+STE_DF_Test_Base_X
 
 ```
+
+### Cross Validation
+
+### Tune:Random Forest w/ text features
+
+```{r}
+data_ctrl<-trainControl(method = "cv", number = 5)
+
+STE_DF_Train_Full_Text<-STE_DF_Train_Full%>%
+  select(`standard`, `reporting category`, `type`, `year`, `discipline core idea`, `pts`, `model_factor`, `algebra_factor`, `state%`, `grade_level`, `school_state_diff` )
+
+STE_DF_Train_Full_Base<-STE_DF_Train_Full%>%
+  select(`standard`, `reporting category`, `type`, `year`, `discipline core idea`, `pts`, `state%`, `grade_level`, `school_state_diff` )
+```
+
+```{r}
+ste_model_caret_rf_text<-train(school_state_diff ~.
+                      , data = STE_DF_Train_Full_Text,
+                      trControl = data_ctrl,
+                      method = "rf")
+
+```
+
+```{r}
+ste_model_caret_rf_text
+
+ste_model_caret_rf_text$finalModel
+
+
+```
+
+```{r}
+ste_model_caret_rf<-train(school_state_diff ~.
+                      , data = STE_DF_Train_Full_Base,
+                      trControl = data_ctrl,
+                      method = "rf")
+
+```
+
+```{r}
+ste_model_caret_rf$finalModel
+
+```
+
+
+
+
+
+### Random Forest Model
+
+#### Regression Base Model
+
+```{r}
+set.seed(444)
+
+STE_diff_RF<-randomForest(STE_DF_Train_Base_X,
+                      y = STE_DF_Train$school_state_diff,
+                      xtest = STE_DF_Test_Base_X,
+                      ytest = STE_DF_Test$school_state_diff,
+                      mtry = 3,
+                      importance = TRUE,
+                      type="regression",
+                      ntree = 500)
+
+
+STE_diff_RF
+```
+
+
+
+```{r}
+
+varImpPlot(STE_diff_RF)
+
+```
+
+
+
+
+
+
 
 ### Random Forest Model w/ text features
 
@@ -2211,10 +2157,10 @@ STE_diff_RF_Text<-randomForest(STE_DF_Train_X,
                       y = STE_DF_Train$school_state_diff,
                       xtest = STE_DF_Test_X,
                       ytest = STE_DF_Test$school_state_diff,
-                      mtry = 3,
+                      mtry = 4,
                       importance = TRUE,
                       type="regression",
-                      ntree = 10000)
+                      ntree = 500)
 
 
 STE_diff_RF_Text
@@ -2224,6 +2170,7 @@ STE_diff_RF_Text
 varImpPlot(STE_diff_RF_Text)
 
 ```
+
 # English Language Arts Exam
 
 ## Create Corpus
@@ -2661,6 +2608,7 @@ size <- log(colSums(df_ELA_worst_inf_toks_smaller))
 # create plot
 textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 3)
 ```
+
 ## Dictionary to Create New Features
 
 ## Dictionary: Key ELA Terms:
@@ -2720,6 +2668,7 @@ ELA_DF<-ELA_DF%>%
   
 
 ```
+
 ## Machine Learning
 
 ```{r}
@@ -2781,9 +2730,6 @@ ELA_DF_Train<-left_join(trainIndexDF, ELA_DF_Train_Full, by = "id")
 ELA_DF_Train
 
 ```
-
-
-
 
 ### Create Test Set
 
@@ -2966,7 +2912,6 @@ varImpPlot(ELA_diff_RF_text)
 
 ```
 
-
 ### Support Vector Regression
 
 ###Base SVM Model
@@ -3000,6 +2945,7 @@ svmCoefs
 
 
 ```
+
 ### SVM w/text feature Model
 
 ```{r}
@@ -3026,6 +2972,7 @@ svm_ela_pred<-predict(svm_ela_base, ELA_DF_Test_X)
 # 
 
 ```
+
 ```{r}
 
 svmCoefs <- as.data.frame(t(coefficients(svm_ela_base)))
@@ -3035,7 +2982,45 @@ svmCoefs
 
 ```
 
+# Results
 
+## Math
+
+-   Random Forest Regression Model w/ parameters from the state item reports tuned with 5-fold
+    cross-validation explained 8% of the variance in the training set
+    and 5% of the variance in the testing set
+
+-   Random Forest Regression Model including 3 additional text extracted features w/ parameters tuned with 5-fold
+    cross-validation explained 11% of the variance in the training set
+    and 9% of the variance in the testing set
+
+    -   The text–extracted feature: `model_factor` played a more significant role than the state provided variable `type` in the variable importance plot.
+    
+
+## STE
+
+-   Random Forest Regression Model w/ parameters from the state item reports tuned with 5-fold
+    cross-validation explained 55% of the variance in the training set
+    and 29% of the variance in the testing set
+
+-   Random Forest Regression Model including 2 additional text extracted features w/ parameters tuned with 5-fold
+    cross-validation explained 57% of the variance in the training set
+    and 32% of the variance in the testing set
+
+    -   The text–extracted feature: `model_factor` played a more significant role than the state provided variables `pts` and `type` in the variable importance plot.
+    
+
+## ELA
+
+-   Random Forest Regression Model w/ parameters from the state item reports tuned with 5-fold
+    cross-validation explained 8% of the variance in the training set
+    and 5% of the variance in the testing set
+
+-   Random Forest Regression Model including 2 additional text extracted features w/ parameters tuned with 5-fold
+    cross-validation explained 11% of the variance in the training set
+    and 9% of the variance in the testing set
+
+    -   The text–extracted feature: `poetry_factor` `figurative_language_factor` played a more significant role than the state provided variable `type` in the variable importance plot.
 
 # Questions
 
@@ -3050,7 +3035,13 @@ those questions.
     other things I should be looking at to evaluate the fit of these
     models?
 
-2.  I tried a SVM regression model; however because there are so many different standards, I received error messages when my test set contained values of the variable `standard` that weren't present in the training set. Is there a way to work around this? This was an issue for the Science and the Math tests but not for the ELA test since the standards are the same across all the grades. I can use a random forest for all of the tests without issue.
+2.  I tried a SVM regression model; however because there are so many
+    different standards, I received error messages when my test set
+    contained values of the variable `standard` that weren't present in
+    the training set. Is there a way to work around this? This was an
+    issue for the Science and the Math tests but not for the ELA test
+    since the standards are the same across all the grades. I can use a
+    random forest for all of the tests without issue.
 
 3.  I would like to do cross-validation and take the average of my RMSE
     to get a better sense of how the model is performing. Will we have
