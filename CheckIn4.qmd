@@ -1479,7 +1479,7 @@ lem_STE_item_tokens2
 
 ### n-grams
 
-When I examine the phrases in the first ten documents of weak items, there
+When I examine the phrases in the first ten documents of weak items, the weakest documents seem to consistently involve the analysis of graphs/diagrams/models. I would like to capture this as a text feature.
 
 ```{r}
 library(phrasemachine) 
@@ -1614,17 +1614,94 @@ df_STE_MS_best_toks_smaller<-dfm_trim(df_STE_MS_best_toks, min_docfreq = .06, do
 
 ## Descriptive Analysis
 
+When I examine the top features, it is notable that the word ***graph*** appears as a top feature of the worst items but not in the best performing items. The words ***analyze*** and ***model*** appear in both the worst and best performing top features; however, words that are associated with physical sciences, like ***force*** appear in the worst items and words associated with life sciences, like ***organism***, ***plant***, and ***population*** appear only in the best performing top features.
+
+## All Items: Top Features
+
 ```{r}
 topfeatures(df_STE_toks2, 20)
 
-topfeatures(df_STE_toks1, 20)
+#topfeatures(df_Math_toks1, 20)
+
+```
+
+## Worstperforming Items: Top Features
+
+```{r}
+STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 0 )
+
+# remove punctuation and numbers
+STE_worst_tokens <- tokens(STE_worst_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
+
+STE_worst_tokens<- tokens_select(STE_worst_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
+
+df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .06, docfreq_type = "prop")
+```
+
+```{r}
 
 topfeatures(df_STE_worst_toks_smaller, 20)
 
 
+```
+
+
+## Best performing Items: Top Features
+
+```{r}
+STE_best_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff > 2 )
+
+# remove punctuation and numbers
+STE_best_tokens <- tokens(STE_best_item_corpus, 
+    remove_punct = T,
+    remove_numbers = T)
+
+
+
+STE_best_tokens<-STE_best_tokens <-tokens_tolower(STE_best_tokens)
+
+STE_best_tokens<- tokens_select(STE_best_tokens, 
+                     pattern = stopwords("en"),
+                     selection = "remove")
+
+
+lem_STE_best_tokens<-tokens_replace(STE_best_tokens,
+                             pattern = lexicon:: hash_lemmas$token,
+                             replacement = lexicon:: hash_lemmas$lemma)
+
+df_STE_best_toks<-dfm(lem_STE_best_tokens)
+
+df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .08, docfreq_type = "prop")
+
+```
+
+```{r}
+topfeatures(df_STE_best_toks_smaller, 20)
+```
+## MS Worst: Top Features
+```{r}
+
 topfeatures(df_STE_MS_worst_toks_smaller, 20)
 
+```
 
+
+## MS Best: Top Features
+```{r}
 topfeatures(df_STE_MS_best_toks_smaller, 20)
 
 ```
@@ -1735,32 +1812,6 @@ textplot_wordcloud(smaller_dfm, min_count =3, random_order = FALSE)
 ### Examine text visuals on worst-performing questions
 
 ```{r}
-STE_worst_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff < 0 )
-
-# remove punctuation and numbers
-STE_worst_tokens <- tokens(STE_worst_item_corpus, 
-    remove_punct = T,
-    remove_numbers = T)
-
-
-
-STE_worst_tokens<-STE_worst_tokens <-tokens_tolower(STE_worst_tokens)
-
-STE_worst_tokens<- tokens_select(STE_worst_tokens, 
-                     pattern = stopwords("en"),
-                     selection = "remove")
-
-lem_STE_worst_tokens<-tokens_replace(STE_worst_tokens,
-                             pattern = lexicon:: hash_lemmas$token,
-                             replacement = lexicon:: hash_lemmas$lemma)
-
-df_STE_worst_toks<-dfm(lem_STE_worst_tokens)
-
-df_STE_worst_toks_smaller<-dfm_trim(df_STE_worst_toks, min_docfreq = .06, docfreq_type = "prop")
-
-
-
-
 
 textplot_wordcloud(df_STE_worst_toks)
 textplot_wordcloud(df_STE_worst_toks_smaller)
@@ -1770,32 +1821,6 @@ textplot_wordcloud(df_STE_worst_toks_smaller)
 ### Examine text visual on best-performing questions
 
 ```{r}
-STE_best_item_corpus<- corpus_subset(STE_item_corpus, school_state_diff > 2 )
-
-# remove punctuation and numbers
-STE_best_tokens <- tokens(STE_best_item_corpus, 
-    remove_punct = T,
-    remove_numbers = T)
-
-
-
-STE_best_tokens<-STE_best_tokens <-tokens_tolower(STE_best_tokens)
-
-STE_best_tokens<- tokens_select(STE_best_tokens, 
-                     pattern = stopwords("en"),
-                     selection = "remove")
-
-
-lem_STE_best_tokens<-tokens_replace(STE_best_tokens,
-                             pattern = lexicon:: hash_lemmas$token,
-                             replacement = lexicon:: hash_lemmas$lemma)
-
-df_STE_best_toks<-dfm(lem_STE_best_tokens)
-
-df_STE_best_toks_smaller<-dfm_trim(df_STE_best_toks, min_docfreq = .08, docfreq_type = "prop")
-
-
-
 
 
 textplot_wordcloud(df_STE_best_toks)
@@ -2198,10 +2223,7 @@ assessing content skills and are not narrative text, the stop words play
 more significant roles?
 
 Given, these results, I will pre-process the data two ways, once using
-the lowest recommended score and once using methods that I suspect based
-on my background knowledge of the topic and the individual regression
-coefficients should not impact the meaning of the text and reduce the
-number of tokens for analysis:
+the lowest recommended score and once including lower case and lemmatization to use for visualzations.
 
 -   Recommended preText score: "S-W-3" (remove stop words,
     Lemmatization/Stemming)
@@ -2259,8 +2281,6 @@ students having different weaknesses according to text type.
 
 ### Tokenization 1: L-W-Lemma
 
-Once we learn more about n-grams, I would like to also incorporate
-n-grams in my preprocessing.
 
 ```{r}
 ## Extract the tokens
@@ -2333,6 +2353,32 @@ lem_ELA_item_tokens1
 df_ELA_toks2<-dfm(lem_ELA_item_tokens2)
 
 df_ELA_toks1<-dfm(lem_ELA_item_tokens1)
+
+```
+
+
+### n-grams
+
+When I examine the phrases in the first ten documents of weak items, the weakest documents seem to consistently involve the analysis of graphs/diagrams/models. I would like to capture this as a text feature.
+
+```{r}
+library(phrasemachine) 
+documents_weak_items<-as.character(corpus_subset(ELA_item_corpus, school_state_diff < -2))[10:15]
+
+#documents_weak_items
+
+phrases<-phrasemachine(documents_weak_items, minimum_ngram_length = 2,
+                         maximum_ngram_length = 4,
+                         return_phrase_vectors = TRUE,
+                         return_tag_sequences = TRUE)
+
+# look at some example phrases
+print(phrases[[1]]$phrases[1:20])
+
+```
+
+```{r}
+documents_weak_items
 
 ```
 
@@ -2446,20 +2492,49 @@ df_ELA_best_inf_toks_smaller<- dfm_trim(df_ELA_best_inf_tokens, min_docfreq = 0.
 
 ## Descriptive Analysis
 
+When I examine the top features, it is notable that the words ***evidence*** and ***support*** appear as top features in informational text but not in literature. The word ***poem*** appears much higher and more frequently as a top feature of in ***worst literature items****.
+
+## All Items: Top Features
+
 ```{r}
 topfeatures(df_ELA_toks2, 20)
 
-topfeatures(df_ELA_toks1, 20)
+#topfeatures(df_Math_toks1, 20)
+
+```
+
+## Lit: Worstperforming Items: Top Features
+
+```{r}
 
 topfeatures(df_ELA_worst_lit_toks_smaller, 20)
+
+
+```
+
+
+## Lit Best performing Items: Top Features
+
+```{r}
 topfeatures(df_ELA_best_lit_toks_smaller, 20)
+```
+## Inf: Worstperforming Items: Top Features
 
-
-topfeatures(df_ELA_best_inf_toks_smaller, 20)
-
+```{r}
 topfeatures(df_ELA_worst_inf_toks_smaller, 20)
 
 ```
+
+
+## Inf Best performing Items: Top Features
+
+```{r}
+
+topfeatures(df_ELA_best_inf_toks_smaller, 20)
+
+```
+
+
 
 ## Visualizations
 
@@ -2614,11 +2689,13 @@ textplot_network(df_ELA_worst_inf_toks_smaller, vertex_size = size/ max(size) * 
 ## Dictionary: Key ELA Terms:
 
 ```{r}
-my_ela_dict <- dictionary(list(poetry=c("poem","stanza", "lyric", "verse")))
+my_ela_dict <- dictionary(list(poetry=c("poem","stanza", "lyric", "verse"),
+                               evidence = c("claim", "support", "evidence", "supports", "purpose"),
+                               fig_language = c("figurative language", "simile", "metaphor")))
 
 my_ela_dict
 
-# patterns_alg=c("equivalent expression","radical expression", "rational expression", #"expression", "eqivalent", "distributive", "distribute", "factor")
+
 ```
 
 ```{r}
@@ -2637,15 +2714,7 @@ df_ELADict
 
 ```
 
-```{r}
-# mathToksDFM_mydict <- df_Math_worst_tokens %>%
-#   dfm_lookup(my_math_dict)
-# 
-# head(mathToksDFM_mydict, 10)
-# 
-# summary(df_Math_toks1)
 
-```
 
 ```{r}
 ELA_DF<-mutate(ELA_DF, ID = as.character(row_number()))
@@ -2663,7 +2732,17 @@ ELA_DF<-ELA_DF%>%
   mutate(poetry_factor = case_when(
     poetry == 0 ~ "no",
     poetry > 0 ~ "yes"
+  ))%>%
+    mutate(fig_language_factor = case_when(
+    fig_language == 0 ~ "no",
+    fig_language > 0 ~ "yes"
+  ))%>%
+    
+    mutate(evidence_factor = case_when(
+    evidence == 0 ~ "no",
+    evidence > 0 ~ "yes"
   ))
+    
 
   
 
@@ -2682,7 +2761,7 @@ ELA_DF_Train_Full<-ELA_DF%>%
   filter(grade_level == 10| grade_level ==8)%>%
   # filter(grade_level == 10 | grade_level == 8| grade_level == 7| grade_level == 6|grade_level == 5)%>%
   mutate(id = row_number())%>%
-   select(`id`, `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`, `poetry_factor`)
+   select(`id`, `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`, `poetry_factor`, fig_language_factor, evidence_factor)
 # 
  ELA_DF_Train_Full
 
@@ -2701,7 +2780,7 @@ trainIndex <- sample(1:N, .8*N)
 testIndex<-c(1:N)[-trainIndex]
 
 # check length of training set
-length(trainIndex)
+#length(trainIndex)
 
 trainIndexDF<-trainIndex
 
@@ -2714,20 +2793,29 @@ dim(trainIndexDF)
 
 #Create training vector
 
-trainIndexDF
+#trainIndexDF
 
 trainIndexDF<-trainIndexDF%>%
   pivot_longer(cols = starts_with("v"), names_to = "value_id", values_to = "id")
 #trainIndexDF<-mutate(trainIndexDF, doc_id = str_trim(paste("text", ID, #sep="")))%>%
 #  select("doc_id")
 
-trainIndexDF
+#trainIndexDF
 
-ELA_DF_Train_Full
+#ELA_DF_Train_Full
 
 ELA_DF_Train<-left_join(trainIndexDF, ELA_DF_Train_Full, by = "id")
 
 ELA_DF_Train
+
+ELA_DF_Train_X<-ELA_DF_Train%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`,  `grade_level`, `poetry_factor`, fig_language_factor, evidence_factor)
+
+ELA_DF_Train_Base_X<-ELA_DF_Train%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`,  `grade_level`)
+
+
+ELA_DF_Train_Y<-ELA_DF_Train$school_state_diff
 
 ```
 
@@ -2740,7 +2828,7 @@ testIndexDF<-testIndex
 
 
 testIndexDF<-as.data.frame(t(testIndex))
-dim(testIndexDF)
+#dim(testIndexDF)
 #dim(ELA_DF_Test)
 
 #Create testing vector
@@ -2756,55 +2844,82 @@ testIndexDF<-testIndexDF%>%
 
 ELA_DF_Test<-left_join(testIndexDF, ELA_DF_Train_Full, by = "id")
 
+ELA_DF_Test_X<-ELA_DF_Test%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`,  `grade_level`, `poetry_factor`, fig_language_factor, evidence_factor)
+
+ELA_DF_Test_Base_X<-ELA_DF_Test%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`,  `grade_level`)
+
+
+ELA_DF_Test_Y<-ELA_DF_Test$school_state_diff
+
+
+
 
 
 ```
 
-### Random Forest Model
+### Cross Validation
 
-#### Base Regression
+### Tune:Random Forest w/ text features
+
+```{r}
+data_ctrl<-trainControl(method = "cv", number = 5)
+
+ELA_DF_Train_Full_Text<-ELA_DF_Train_Full%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`, `poetry_factor`, fig_language_factor, evidence_factor, `school_state_diff` )
+
+ELA_DF_Train_Full_Base<-ELA_DF_Train_Full%>%
+  select(`standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `school_state_diff`, `grade_level`, `school_state_diff` )
+```
+
+```{r}
+ela_model_caret_rf_text<-train(school_state_diff ~.
+                      , data = ELA_DF_Train_Full_Text,
+                      trControl = data_ctrl,
+                      method = "rf")
+
+```
+
+```{r}
+ela_model_caret_rf_text
+
+ela_model_caret_rf_text$finalModel
+
+
+```
+
+
+### Tune:Base Random Forest
+```{r}
+ela_model_caret_rf<-train(school_state_diff ~.
+                      , data = ELA_DF_Train_Full_Base,
+                      trControl = data_ctrl,
+                      method = "rf")
+
+```
 
 ```{r}
 
-
-ELA_DF_Train_X<-ELA_DF_Train%>%
-  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`)
-
-ELA_DF_Train_Y<-ELA_DF_Train%>%
-  select(`school_state_diff`)
-
-ELA_DF_Train_Y
-
-
-
-ELA_DF_Test_X<-ELA_DF_Test%>%
-select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`)
-
-
-ELA_DF_Test_Y<-ELA_DF_Test%>%
-  select(`school_state_diff`)
-
-
-ELA_DF_Test_Y
-ELA_DF_Train_Y
-
-ELA_DF_Train_X
-
-ELA_DF_Test_X
+ela_model_caret_rf
+ela_model_caret_rf$finalModel
 
 ```
+
+
+
 
 ```{r}
 set.seed(444)
 
-ELA_diff_RF<-randomForest(ELA_DF_Train_X,
+ELA_diff_RF<-randomForest(ELA_DF_Train_Base_X,
                       y = ELA_DF_Train$school_state_diff,
-                      xtest = ELA_DF_Test_X,
+                      xtest = ELA_DF_Test_Base_X,
                       ytest = ELA_DF_Test$school_state_diff,
-                      mtry = 1,
+                      mtry = 2,
                       importance = TRUE,
                       type="regression",
-                      ntree = 1000)
+                      ntree = 500)
 
 
 ```
@@ -2837,49 +2952,21 @@ varImpPlot(ELA_diff_RF)
 
 ```
 
-#### Regression w/text
-
-```{r}
+### RF Regression w/text
 
 
-ELA_DF_Train_X<-ELA_DF_Train%>%
-  select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`, poetry_factor)
-
-ELA_DF_Train_Y<-ELA_DF_Train%>%
-  select(`school_state_diff`)
-
-ELA_DF_Train_Y
-
-
-
-ELA_DF_Test_X<-ELA_DF_Test%>%
-select( `standard`, `reporting category`, `Cluster`, `text_type`, `year`, `state%`, `grade_level`, poetry_factor)
-
-
-ELA_DF_Test_Y<-ELA_DF_Test%>%
-  select(`school_state_diff`)
-
-
-ELA_DF_Test_Y
-ELA_DF_Train_Y
-
-ELA_DF_Train_X
-
-ELA_DF_Test_X
-
-```
 
 ```{r}
 set.seed(444)
 
-ELA_diff_RF_text<-randomForest(ELA_DF_Train_X,
+ELA_diff_RF_text<-randomForest(x = ELA_DF_Train_X,
                       y = ELA_DF_Train$school_state_diff,
                       xtest = ELA_DF_Test_X,
                       ytest = ELA_DF_Test$school_state_diff,
-                      mtry = 1,
+                      mtry = 2,
                       importance = TRUE,
                       type="regression",
-                      ntree = 1000)
+                      ntree = 500)
 
 
 ```
@@ -3012,15 +3099,17 @@ svmCoefs
 
 ## ELA
 
+The ELA model was not able to explain variance in student performance; however the model with that included text extracted features performed better than the model w/out those features.
+
 -   Random Forest Regression Model w/ parameters from the state item reports tuned with 5-fold
-    cross-validation explained 8% of the variance in the training set
-    and 5% of the variance in the testing set
+    cross-validation explained -2% of the variance in the training set
+    and -17% of the variance in the testing set
 
 -   Random Forest Regression Model including 2 additional text extracted features w/ parameters tuned with 5-fold
-    cross-validation explained 11% of the variance in the training set
-    and 9% of the variance in the testing set
+    cross-validation explained 0% of the variance in the training set
+    and -10% of the variance in the testing set
 
-    -   The text–extracted feature: `poetry_factor` `figurative_language_factor` played a more significant role than the state provided variable `type` in the variable importance plot.
+    -   The text–extracted feature: `poetry_factor` and `figurative_language_factor` played a more significant role than ***most*** of the state provided variables in the variable importance plot. Notably the variable `grade_level` had the highest significance. This is interesting as the standards are the same in ELA across all grade levels. In our school there is one teacher for each grade level. This seems to suggest that in English Language Arts there is a broad inconsistency in how the teachers are addressing the standards within their courses. 
 
 # Questions
 
@@ -3028,12 +3117,8 @@ svmCoefs
 At this phase, you might have more questions than answers. Document all
 those questions.
 
-1.  I fit a random forest model that included features extracted from my
-    dictionaries to predict `school_state_diff`. My plan is to also fit
-    a random forest model that does not include my dictionary extracted
-    features to see if there is a difference in the RMSE. Are there
-    other things I should be looking at to evaluate the fit of these
-    models?
+1.  For each subject, I ran cross validation to tune the parameters of a Random Forest models that did not include text features and to tune the parameters of a Random Forest model that did include text features. Then I compared the %variance explained and the RMSE and MAE as well as differences in the variable importance plot. I am assuming these are the key items to discuss in my "Results" section. Is there anything else I should be adding. I wrote a few bullet points for now that I will have to flesh out in my final submission.
+
 
 2.  I tried a SVM regression model; however because there are so many
     different standards, I received error messages when my test set
@@ -3041,15 +3126,8 @@ those questions.
     the training set. Is there a way to work around this? This was an
     issue for the Science and the Math tests but not for the ELA test
     since the standards are the same across all the grades. I can use a
-    random forest for all of the tests without issue.
+    random forest for all of the tests without issue. Is it ok to just stick with the Random Forest Regressions?
 
-3.  I would like to do cross-validation and take the average of my RMSE
-    to get a better sense of how the model is performing. Will we have
-    any samples of this in R-tutorials? I have done it in python but not
-    in R.
+3.  The model explained much more of the variance in the student performance in the Science Exam than the other exams. This was an interesting surprise/; is it ok to conjecture ideas as to why that could be true in my writing?
 
-4.  Once I work out these details with the fitting and evaluating the
-    models, I would like to follow the same process of creating
-    dictionaries, extracting new features, and then fitting and
-    evaluating predictive models for the Science and ELA exams. Is there
-    anything else you think I should be incorporating in my process?
+4. I have tried to comment out many of the lines of code that were "sanity checks" for me and produced tables. When I create tokens, I have been printing the summary of the tokens. This takes up a lot of space. Is this something you want to see in the paper to get a sense of the corpus, or should I comment out these summaries?
